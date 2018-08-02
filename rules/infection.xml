@@ -1,0 +1,50 @@
+<!--
+http://schemas.mandiant.com/
+http://openioc.org/terms/Current.iocterms
+-->
+<PowerSponse>
+	<Rule id="12341234-1234-1234-1234-123412341234">
+		<name>myrule-check</name>
+		<author>userX</author>
+		<date>2017-01-14</date>
+		<description>Description...here...</description>
+		<links>https://swisscom.com/security, https://swisscom.ch/security</links>
+		<Action>
+			<type>ServiceItem</type>
+			<name>my service name</name>
+		</Action>
+		<action>
+			<type>ServiceItem</type>
+			<name>my service name2</name>
+		</action>
+		<action>
+			<type>FileItem</type>
+			<path>%appdata%</path>
+			<name>good.dll</name>
+		</action>
+		<action>
+			<type>TaskItem</type>
+			<searchstring>\d{3}</searchstring>>
+		</action>
+		<action>
+			<type>ProcessItem</type>
+			<Name>calc</Name>
+		</action>
+		<action>
+			<type>RegistryItem</type>
+			<value>HKCU:\Software\evilkey\value</value>
+		</action>
+		<action>
+			<type>FirewallItem</type>
+			<binary>evil.exe</binary>
+			<protocol>tcp</protocol>
+			<port>443</port>
+		</action>
+		<action>
+			<type>FirewallItem</type>
+			<binary>C:\bad.exe</binary>
+			<protocol>tcp</protocol>
+			<port>80,443</port>
+		</action>
+	</Rule>
+</PowerSponse>

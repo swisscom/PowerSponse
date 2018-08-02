@@ -1,0 +1,25 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+Disable-RemoteRegistry	.\PowerSponse.Tests.ps1	/^Describe 'Disable-RemoteRegistry' {$/;"	m
+Disable-Service	.\PowerSponse.Tests.ps1	/^Describe 'Disable-Service' {$/;"	m
+Edit-ScheduledTask	.\PowerSponse.Tests.ps1	/^Describe 'Edit-ScheduledTask' {$/;"	m
+Enable-RemoteRegistry	.\PowerSponse.Tests.ps1	/^Describe 'Enable-RemoteRegistry' {$/;"	m
+Enable-Service	.\PowerSponse.Tests.ps1	/^Describe 'Enable-Service' {$/;"	m
+Find-File	.\PowerSponse.Tests.ps1	/^Describe 'Find-File'{$/;"	m
+Get-Certificate	.\PowerSponse.Tests.ps1	/^Describe 'Get-Certificate' {$/;"	m
+Get-NetworkInterface	.\PowerSponse.Tests.ps1	/^Describe 'Get-NetworkInterface' {$/;"	m
+Get-PowerSponseRepository	.\PowerSponse.Tests.ps1	/^Describe 'Get-PowerSponseRepository' {$/;"	m
+Get-PowerSponseRule	.\PowerSponse.Tests.ps1	/^Describe 'Get-PowerSponseRule' {$/;"	m
+Get-Process	.\PowerSponse.Tests.ps1	/^Describe 'Get-Process' {$/;"	m
+Get-Target	.\PowerSponse.Tests.ps1	/^Describe 'Get-Target' {$/;"	m
+Import-PowerSponseRepository	.\PowerSponse.Tests.ps1	/^Describe 'Import-PowerSponseRepository' {$/;"	m
+Invoke-PowerSponse	.\PowerSponse.Tests.ps1	/^Describe 'Invoke-PowerSponse' {$/;"	m
+Set-PowerSponseRepository	.\PowerSponse.Tests.ps1	/^Describe 'Set-PowerSponseRepository' {$/;"	m
+Start-Service	.\PowerSponse.Tests.ps1	/^Describe 'Start-Service' {$/;"	m
+Stop-Process	.\PowerSponse.Tests.ps1	/^Describe 'Stop-Process' {$/;"	m
+Stop-Service	.\PowerSponse.Tests.ps1	/^Describe 'Stop-Service' {$/;"	m
+start-process	.\PowerSponse.Tests.ps1	/^Describe 'start-process' {$/;"	m

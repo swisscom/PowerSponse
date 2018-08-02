@@ -1,0 +1,62 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+Add-RegistryKey	.\functions\Registry.ps1	/^Function Add-RegistryKey()$/;"	m
+Disable-NetworkInterface	.\functions\Network.ps1	/^Function Disable-NetworkInterface()$/;"	m
+Disable-PSRemoting	.\functions\Support.ps1	/^Function Disable-PSRemoting()$/;"	m
+Disable-RemoteRegistry	.\functions\Support.ps1	/^Function Disable-RemoteRegistry()$/;"	m
+Disable-ScheduledTask	.\functions\ScheduledTask.ps1	/^function Disable-ScheduledTask()$/;"	m
+Disable-Service	.\functions\Services.ps1	/^Function Disable-Service()$/;"	m
+Edit-Computer	.\functions\Computer.ps1	/^Function Edit-Computer()$/;"	m
+Edit-NetworkInterface	.\functions\Network.ps1	/^Function Edit-NetworkInterface()$/;"	m
+Edit-ScheduledTask	.\functions\ScheduledTask.ps1	/^Function Edit-ScheduledTask()$/;"	m
+Edit-Service	.\functions\Services.ps1	/^Function Edit-Service()$/;"	m
+Enable-NetworkInterface	.\functions\Network.ps1	/^Function Enable-NetworkInterface()$/;"	m
+Enable-PSRemoting	.\functions\Support.ps1	/^Function Enable-PSRemoting()$/;"	m
+Enable-RemoteRegistry	.\functions\Support.ps1	/^Function Enable-RemoteRegistry()$/;"	m
+Enable-ScheduledTask	.\functions\ScheduledTask.ps1	/^function Enable-ScheduledTask()$/;"	m
+Enable-Service	.\functions\Services.ps1	/^Function Enable-Service()$/;"	m
+Find-Directory	.\functions\File.ps1	/^Function Find-Directory()$/;"	m
+Find-File	.\functions\File.ps1	/^Function Find-File()$/;"	m
+Function-Template	.\functions\Template.ps1	/^Function Function-Template()$/;"	m
+Get-Autoruns	.\functions\Collection.ps1	/^function Get-Autoruns()$/;"	m
+Get-Certificate	.\functions\Certificate.ps1	/^Function Get-Certificate()$/;"	m
+Get-DNSSetting	.\functions\Network.ps1	/^Function Get-DNSSetting()$/;"	m
+Get-FileHandle	.\functions\File.ps1	/^function Get-FileHandle()$/;"	m
+Get-FirewallRule	.\functions\Firewall.ps1	/^Function Get-FirewallRule()$/;"	m
+Get-NetworkInterface	.\functions\Network.ps1	/^Function Get-NetworkInterface()$/;"	m
+Get-PowerSponseRepository	.\PowerSponse.psm1	/^function Get-PowerSponseRepository()$/;"	m
+Get-PowerSponseRule	.\PowerSponse.psm1	/^function Get-PowerSponseRule()$/;"	m
+Get-Process	.\functions\Process.ps1	/^Function Get-Process()$/;"	m
+Get-RegistryKey	.\functions\Registry.ps1	/^Function Get-RegistryKey()$/;"	m
+Get-ScheduledTask	.\functions\ScheduledTask.ps1	/^Function Get-ScheduledTask()$/;"	m
+Get-Service	.\functions\Services.ps1	/^Function Get-Service()$/;"	m
+Get-Sysmon	.\functions\Collection.ps1	/^function Get-Sysmon()$/;"	m
+Get-Target	.\functions\Support.ps1	/^Function Get-Target()$/;"	m
+Import-PowerSponseRepository	.\PowerSponse.psm1	/^Function Import-PowerSponseRepository()$/;"	m
+Invoke-PowerSponse	.\PowerSponse.psm1	/^Function Invoke-PowerSponse()$/;"	m
+Invoke-PsExec	.\functions\Process.ps1	/^Function Invoke-PsExec()$/;"	m
+New-CleanupPackage	.\PowerSponse.psm1	/^Function New-CleanupPackage()$/;"	m
+New-PowerSponseObject	.\functions\Support.ps1	/^function New-PowerSponseObject()$/;"	m
+Remove-Certificate	.\functions\Certificate.ps1	/^Function Remove-Certificate()$/;"	m
+Remove-Directory	.\functions\File.ps1	/^Function Remove-Directory()$/;"	m
+Remove-File	.\functions\File.ps1	/^Function Remove-File()$/;"	m
+Remove-RegistryKey	.\functions\Registry.ps1	/^Function Remove-RegistryKey()$/;"	m
+Remove-ScheduledTask	.\functions\ScheduledTask.ps1	/^Function Remove-ScheduledTask()$/;"	m
+Remove-Service	.\functions\Services.ps1	/^Function Remove-Service()$/;"	m
+Rename-Directory	.\functions\File.ps1	/^Function Rename-Directory()$/;"	m
+Rename-File	.\functions\File.ps1	/^Function Rename-File()$/;"	m
+Restart-Computer	.\functions\Computer.ps1	/^Function Restart-Computer()$/;"	m
+Set-DNSSetting	.\functions\Network.ps1	/^Function Set-DNSSetting()$/;"	m
+Set-FirewallRule	.\functions\Firewall.ps1	/^Function Set-FirewallRule()$/;"	m
+Set-PowerSponseRepository	.\PowerSponse.psm1	/^function Set-PowerSponseRepository()$/;"	m
+Start-Process	.\functions\Process.ps1	/^Function Start-Process()$/;"	m
+Start-ScheduledTask	.\functions\ScheduledTask.ps1	/^Function Start-ScheduledTask()$/;"	m
+Start-Service	.\functions\Services.ps1	/^Function Start-Service()$/;"	m
+Stop-Computer	.\functions\Computer.ps1	/^Function Stop-Computer()$/;"	m
+Stop-Process	.\functions\Process.ps1	/^Function Stop-Process()$/;"	m
+Stop-ScheduledTask	.\functions\ScheduledTask.ps1	/^Function Stop-ScheduledTask()$/;"	m
+Stop-Service	.\functions\Services.ps1	/^Function Stop-Service()$/;"	m

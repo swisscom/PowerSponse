@@ -1,0 +1,3 @@
+https://download.sysinternals.com/files/Autoruns.zip
+https://download.sysinternals.com/files/PSTools.zip
+https://download.sysinternals.com/files/Handle.zip

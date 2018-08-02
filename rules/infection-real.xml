@@ -1,0 +1,21 @@
+<PowerSponse>
+	<Rule>
+		<name>Test-Rule</name>
+		<author>author X</author>
+		<date>2017-01-14</date>
+		<description>Test-Rule for Invoke-PowerSponse with some real data</description>
+		<links></links>
+		<Action>
+			<type>ServiceItem</type>
+			<name>RemoteRegistry</name>
+		</Action>
+		<action>
+			<type>TaskItem</type>
+			<searchstring>adobe</searchstring>
+		</action>
+		<action>
+			<type>ProcessItem</type>
+			<Name>calc</Name>
+		</action>
+	</Rule>
+</PowerSponse>

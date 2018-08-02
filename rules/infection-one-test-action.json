@@ -1,0 +1,18 @@
+{
+	"PowerSponse": {
+		"Rule" : [
+			{
+				"id" : "12341234-1234-1234-1234-123412341234",
+				"name" : "my json rule",
+				"author" : "UserX",
+				"description" : "Lectus eu magna vulputate ultrices. Aliquam interdum varius enim. Maecenas at mauris. Sed sed nibh. Nam non turpis. Maecenas fermentum nibh in est. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.",
+				"action" : [
+					{
+						"type" : "ServiceItem",
+						"name" : "my service name"
+					}
+				]
+			}
+		]
+	}
+}
