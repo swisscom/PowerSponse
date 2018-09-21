@@ -5,9 +5,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased](https://github.com/swisscom/PowerSponse/compare/v0.1.0...master)
-<!--
 ### Added
+* Add `Invoke-PsExec` for easier usage of PsExec and remote command execution.
+    The function returns both the PowerSponse objects (fail/pass, timestamp,
+    ...) and the program output (exit code, stdout, stderr).
 ### Changed
+* Use `Invoke-PsExec` inside of `Get-Autoruns`. Therefore, the whole handling
+    of RemoteRegistry is not needed in `Get-Autoruns` and all code is inside
+    `Invoke-PsExec`.
+* Add parameter `FilenamePostfix` to specify postfix for filename in output of
+    `Get-Autoruns`.
+<!--
 ### Fixed
 ### Security
 ### Deprecated
