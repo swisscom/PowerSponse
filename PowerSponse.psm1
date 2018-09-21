@@ -574,7 +574,8 @@ Export-ModuleMember @(
 	'Get-PowerSponseRepository',
 	'Set-PowerSponseRepository',
 	'Import-PowerSponseRepository',
-	'Get-FileHandle'
+	'Get-FileHandle',
+    'Invoke-PsExec'
 )
 
 #endregion

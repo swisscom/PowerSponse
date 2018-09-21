@@ -134,7 +134,7 @@ Function Edit-Service()
 						if (!(Test-Path -Path "$BinPath\psservice.exe"))
 						{
 							$Status = "fail"
-							$Reason = "Binary psservice not found."
+							$Reason = "Binary $BinPath\psservice.exe not found."
 						}
 						else
 						{
@@ -502,7 +502,7 @@ Function Enable-Service()
 						if (!(Test-Path -Path "$BinPath\psservice.exe"))
 						{
 							$Status = "fail"
-							$Reason = "Binary psservice not found."
+							$Reason = "Binary $BinPath\psservice.exe not found."
 						}
 						else
 						{
@@ -696,7 +696,7 @@ Function Disable-Service()
 						if (!(Test-Path -Path "$BinPath\psservice.exe"))
 						{
 							$Status = "fail"
-							$Reason = "Binary psservice not found."
+							$Reason = "Binary $BinPath\psservice.exe not found."
 						}
 						else
 						{

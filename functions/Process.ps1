@@ -1,33 +1,146 @@
+# returns a tuple (PowerSponse object and 2nd the execution output)
 Function Invoke-PsExec()
 {
 	[CmdletBinding(SupportsShouldProcess=$True)]
 	param
 	(
-		[ValidateSet("External")]
-		[string] $Method = "External",
-		[string] $BinPath = $(Join-Path -Path $ModuleRoot -ChildPath "\bin"),
-		[string] $Binary,
-		[string] $CommandLine
+		[string[]] $ComputerName,
+		[string] $Program,
+		[string] $CommandLine,
+		[switch] $AsSystem = $false,
+		[switch] $CopyProgramToRemoteSystem = $false,
+		[switch] $ForceCopyProgramToRemoteSystem = $false
 	)
 
-	Throw "not implemented yet"
-	return
+	$Function = $MyInvocation.MyCommand
+	Write-Verbose "Entering $Function"
 
-	# check binary availablity
+	$returnobject = @()
+	$RemoteRegistryStarted = $false
+	$WhatIfPassed = $false
+	$Status = ""
+	$Reason = ""
+	$ReturnValue = $null
 
-	# enable RemoteRegistry
-	# start RemoteRegistry
-	
-	# execute supplied command
-	$ret = Start-Process psexec.exe -CommandLine "-nobanner -accepteula $Binary $CommandLine"
-	if ( $ret.ExitCode -eq 0 )
+	Write-Verbose "Using PsExec for starting '$Program' on '$ComputerName'."
+
+	$Arguments = "Program: $Program, CommandLine: $CommandLine, AsSystem: $AsSystem, CopyFile: $CopyProgramToRemoteSystem, ForceCopy: $ForceCopyProgramToRemoteSystem"
+
+	$ComputerName = Get-Target -ComputerName:$(if ($ComputerName){$ComputerName})
+
+	if ($PSBoundParameters.ContainsKey('whatif') -and $PSBoundParameters['whatif'])
 	{
-		$ret.stdout
-		$ret.stderr
+		$WhatIfPassed = $true
+	}
+	Write-Verbose "whatif: $WhatIfPassed"
+
+	# Enable and start RemoteRegistry
+	try
+	{
+		# Enable RemoteRegistry for psexec
+		$params = @{
+			'method' = "external";
+			'ComputerName' = $ComputerName;
+			'WhatIf' = $WhatIfPassed;
+			'OnlineCheck' = $false
+		}
+		$err = Enable-RemoteRegistry @params
+		$returnobject += $err
+		$params = @{
+			'ComputerName' = $ComputerName;
+			'method' = "external";
+			'WhatIf' = $WhatIfPassed;
+			'Name' = "RemoteRegistry";
+			'OnlineCheck' = $false
+		}
+		$srr = Start-Service @params
+		$returnobject += $srr
+		$RemoteRegistryStarted = ($srr.status -match "pass")
+	}
+	catch
+	{
+		$Status = "fail"
+		$Reason = "Error while enabling RemoteRegistry"
+		$returnobject += New-PowerSponseObject -Function $Function -Status $Status -Reason $Reason
 	}
 
-	# stop RemoteRegistry
-	# disable RemoteRegistry
+	if ($pscmdlet.ShouldProcess($ComputerName, "Execute $Program $CommandLine"))
+	{
+		if ($RemoteRegistryStarted)
+		{
+			Write-Progress -Activity "Running $Function" -Status "Run '$Program $CommandLine' on $ComputerName..."
+
+			$CommandLinePsExec  = "-accepteula -nobanner "
+			$CommandLinePsExec += "\\$ComputerName "
+			if ($AsSystem) {
+				$CommandLinePsExec += "-s "
+			}
+			if ($CopyProgramToRemoteSystem)
+			{
+				$CommandLinePsExec += "-c "
+			}
+			if ($ForceCopyProgramToRemoteSystem)
+			{
+				$CommandLinePsExec += "-f "
+			}
+			$CommandLinePsExec += "`"$Program`" $CommandLine"
+
+			Write-Verbose "Using CommandLine for PsExec: $CommandLinePsExec"
+
+			$params = @{
+			   'Binary' = "PsExec.exe";
+			   'CommandLine' = $CommandLinePsExec
+			}
+
+			$ReturnValue = (Start-Process @params)
+
+			if ($ReturnValue.exitcode -eq 0)
+			{
+				$Status = "pass"
+				$Reason = "See stdout/stderr in return value."
+			}
+			else
+			{
+				$Status = "fail"
+				$Reason = "Error running '$Program $CommandLine' on $ComputerName. Wrong arguments or could be due to permissions. See stdout/stderr from return value."
+			}
+		}
+		else
+		{
+			$Status = "fail"
+			$Reason = "RemoteRegistry could not be started."
+		}
+	} #no whatif given
+	else
+	{
+		$Status = "pass"
+		$Reason = "Not executed - started with -WhatIf"
+	} #whatif used
+
+	# Stop and Disable RemoteRegistry
+	if ($RemoteRegistryStarted -or $WhatIfPassed)
+	{
+		try
+		{
+			Write-Verbose "Cleanup RemoteRegistry on $ComputerName"
+			$srr = Stop-Service -ComputerName $ComputerName -method external -Name "RemoteRegistry" -WhatIf:$WhatIfPassed -OnlineCheck:$false
+			$returnobject += $srr
+			$drr = Disable-RemoteRegistry -method external -ComputerName $ComputerName -WhatIf:$WhatIfPassed -OnlineCheck:$false
+			$returnobject += $drr
+		}
+		catch
+		{
+			$Status = "fail"
+			$Reason = "Error while disabling RemoteRegistry"
+		}
+	}
+
+	$returnobject += New-PowerSponseObject -Function $Function -ComputerName $ComputerName -Arguments $Arguments -Status $Status -Reason $Reason
+
+	# returnobject with all powersponse objects and return value from psexec call
+	$returnobject,$ReturnValue
+
+	Write-Verbose "Leaving $($MyInvocation.MyCommand)"
 }
 
 Function Get-Process()
@@ -421,15 +534,15 @@ Function Stop-Process()
 
 	if (!$Name -and !$Pid)
 	{
- 		$Status = "fail"
- 		$Reason = "no process name or process id"
- 		$returnobject += New-PowerSponseObject -Function $Function -Status $Status -Reason $Reason -Arguments $Arguments
+		 $Status = "fail"
+		 $Reason = "no process name or process id"
+		 $returnobject += New-PowerSponseObject -Function $Function -Status $Status -Reason $Reason -Arguments $Arguments
 	}
 	elseif ($Name -and $Pid)
 	{
- 		$Status = "fail"
- 		$Reason = "both process name or process id given"
- 		$returnobject += New-PowerSponseObject -Function $Function -Status $Status -Reason $Reason -Arguments $Arguments
+		 $Status = "fail"
+		 $Reason = "both process name or process id given"
+		 $returnobject += New-PowerSponseObject -Function $Function -Status $Status -Reason $Reason -Arguments $Arguments
 	}
 	else
 	{
