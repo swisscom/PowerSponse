@@ -1,7 +1,7 @@
 ---
 external help file: PowerSponse-help.xml
 Module Name: PowerSponse
-online version: https://github.com/swisscom/PowerSponse/master/docs/Invoke-PsExec.md
+online version: https://github.com/swisscom/PowerSponse/blob/master/docs/Invoke-PsExec.md
 schema: 2.0.0
 ---
 

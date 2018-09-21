@@ -38,9 +38,8 @@ Import-Module .\PowerSponse.psd1 -Force
 New-MarkdownHelp -Module PowerSponse -OutputFolder .\docs\ -WithModulePage -Force -HelpVersion "1.0.0.0"
 
 # 3. Create new markdown help file for specific command
-New-MarkdownHelp -Command Restart-Computer -OutputFolder .\docs\ -OnlineVersionUrl "https://github.com/swisscom/PowerSponse/master/docs/Restart-Computer.md" 
+New-MarkdownHelp -Command Restart-Computer -OutputFolder .\docs\ -OnlineVersionUrl "https://github.com/swisscom/PowerSponse/blob/master/docs/Restart-Computer.md" 
 ```
-
 For updating the markdown help use instead the following commands
 
 ``` powershell

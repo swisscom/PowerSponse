@@ -5156,7 +5156,7 @@ Reason       : \G2MUpdateTask-S-1-5-21-111111111-2222222222-333333333-444444 ; \
     <command:relatedLinks>
       <maml:navigationLink>
         <maml:linkText>Online Version:</maml:linkText>
-        <maml:uri>https://github.com/swisscom/PowerSponse/master/docs/Invoke-PsExec.md</maml:uri>
+        <maml:uri>https://github.com/swisscom/PowerSponse/blob/master/docs/Invoke-PsExec.md</maml:uri>
       </maml:navigationLink>
     </command:relatedLinks>
   </command:command>
