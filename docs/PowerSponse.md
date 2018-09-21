@@ -66,6 +66,9 @@ Reload the PowerSponse repository from the file.
 ### [Invoke-PowerSponse](Invoke-PowerSponse.md)
 Read the CORE rules and invokes all defined cleanup commands.
 
+### [Invoke-PsExec](Invoke-PsExec.md)
+Executes a given program on a remote host.
+
 ### [New-CleanupPackage](New-CleanupPackage.md)
 Creates a new cleanup package.
 
