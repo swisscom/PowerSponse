@@ -14,7 +14,7 @@ Collect Autoruns output.
 
 ```
 Get-Autoruns [[-ComputerName] <String[]>] [[-ComputerList] <String>] [[-OutputPath] <String>]
- [-NoRemoteRegistry] [-WhatIf] [-Confirm] [<CommonParameters>]
+ [-NoRemoteRegistry] [-FilenamePostfix <String>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -117,6 +117,21 @@ The cmdlet is not run.
 Type: SwitchParameter
 Parameter Sets: (All)
 Aliases: wi
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -FilenamePostfix
+{{Fill FilenamePostfix Description}}
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
 
 Required: False
 Position: Named
