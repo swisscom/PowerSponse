@@ -152,7 +152,7 @@ Function Get-Process()
 
 		[string] $ComputerList,
 
-		[ValidateSet("WMI", "External")]
+		[ValidateSet("WMI", "External", "WinRM")]
 		[string] $Method = "WMI",
 
 		[string] $BinPath = $(Join-Path -Path $ModuleRoot -ChildPath "\bin"),
@@ -175,6 +175,7 @@ Function Get-Process()
 	Write-Verbose "Entering $Function"
 
 	$returnobject = @()
+    $res = ""
 
 	$Arguments = $(if ($SearchString) { "SearchString $($SearchString)" } else { "Pid: $($Pid)" } )
 
@@ -200,7 +201,7 @@ Function Get-Process()
 		{
 			Write-Progress -Activity "Running $Function" -Status "Processing $target..."
 
-			if ($pscmdlet.ShouldProcess($target, "Get Process with method $($Method)"))
+			if ($pscmdlet.ShouldProcess($target, "Get process with method $($Method)"))
 			{
 				if (!(Test-Connection $target -Quiet -Count 1))
 				{
@@ -273,6 +274,88 @@ Function Get-Process()
 					}
 					elseif ($Method -match "winrm")
 					{
+                        Write-Verbose "Using WinRM - SearchString: $SearchString, Id: $Pid"
+
+                        try
+						{
+							if ($SearchString)
+							{
+						        if ($target -eq "localhost" -and $Credential)
+                                {
+                                    $res = invoke-command -Credential $Credential -ScriptBlock {param($p1)Microsoft.PowerShell.Management\get-process -name "$p1"} -ArgumentList $SearchString -ea SilentlyContinue
+                                }
+                                elseif ($target -eq "localhost")
+                                {
+                                    $res = invoke-command -ScriptBlock {param($p1)Microsoft.PowerShell.Management\get-process -name "$p1"} -ArgumentList $SearchString -ea SilentlyContinue
+                                }
+                                elseif ($Credential)
+                                {
+                                    $res = invoke-command -ComputerName $target -Credential $Credential -ScriptBlock {param($p1)Microsoft.PowerShell.Management\get-process -name "$p1"} -ArgumentList $SearchString -ea SilentlyContinue
+                                }
+                                else
+                                {
+                                    $res = invoke-command -ComputerName $target -ScriptBlock {param($p1)Microsoft.PowerShell.Management\get-process -name "$p1"} -ArgumentList $SearchString -ea SilentlyContinue
+                                }
+							}
+							else
+							{
+						        if ($target -eq "localhost" -and $Credential)
+                                {
+                                    $res = invoke-command -Credential $Credential -ScriptBlock {param($p1)Microsoft.PowerShell.Management\get-process -id $p1} -ArgumentList $pid -ea SilentlyContinue
+                                }
+                                elseif ($target -eq "localhost")
+                                {
+                                    $res = invoke-command -ScriptBlock {param($p1)Microsoft.PowerShell.Management\get-process -id $p1} -ArgumentList $pid -ea SilentlyContinue
+                                }
+                                elseif ($Credential)
+                                {
+                                    $res = invoke-command -ComputerName $target -Credential $Credential -ScriptBlock {param($p1)Microsoft.PowerShell.Management\get-process -id $p1} -ArgumentList $pid -ea SilentlyContinue
+                                }
+                                else
+                                {
+                                    $res = invoke-command -ComputerName $target -ScriptBlock {param($p1)Microsoft.PowerShell.Management\get-process -Id $p1} `
+                                        -ArgumentList $pid -ea SilentlyContinue
+                                }
+							}
+
+							if (!$res)
+							{
+								$Status = "fail"
+								$Reason = "no process found"
+							}
+							# not used currently to distinguish between one or multiple processes
+							#elseif ((($res | measure).count -gt 1 ))
+							#{
+							#	$Status = "fail"
+							#	$Reason = "multiple processes found"
+							#}
+							else
+							{
+								$Status = "pass"
+								$Reason = @()
+
+								foreach ($proc in $res)
+								{
+									if ($OutputFormat -match "OnlyPid")
+									{
+									 $Reason += "$($proc.Id)"
+									}
+									elseif ($OutputFormat -match "OnlyName")
+									{
+										$Reason += "$($proc.ProcessName)"
+									}
+									else
+									{
+										$Reason += "$($proc.Id) ; $($proc.ProcessName) ; $($proc.Path)"
+									}
+								}
+							}
+                        }
+						catch
+						{
+							$Status = "fail"
+							$Reason = "error while connecting to remote host"
+						}
 					}
 					elseif ($Method -match "external")
 					{

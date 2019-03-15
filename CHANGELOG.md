@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 * Add `Invoke-PsExec` for easier usage of PsExec and remote command execution.
     The function returns both the PowerSponse objects (fail/pass, timestamp,
     ...) and the program output (exit code, stdout, stderr).
+* Add WinRM implementation for `Get-Process`
 ### Changed
 * Use `Invoke-PsExec` inside of `Get-Autoruns`. Therefore, the whole handling
     of RemoteRegistry is not needed in `Get-Autoruns` and all code is inside
