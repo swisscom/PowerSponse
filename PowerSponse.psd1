@@ -24,7 +24,7 @@ Author = 'Swisscom (Schweiz) AG'
 CompanyName = 'Swisscom (Schweiz) AG'
 
 # Copyright statement for this module
-Copyright = '(c) 2018 Swisscom (Schweiz) AG'
+Copyright = '(c) 2019 Swisscom (Schweiz) AG'
 
 # Description of the functionality provided by this module
 Description = 'The module allows a fast and easy way to contain and remediate a threat on a remote host.'
