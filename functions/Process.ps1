@@ -1,474 +1,466 @@
 # returns a tuple (PowerSponse object and 2nd the execution output)
 Function Invoke-PsExec()
 {
-	[CmdletBinding(SupportsShouldProcess=$True)]
-	param
-	(
-		[string[]] $ComputerName,
-		[string] $Program,
-		[string] $CommandLine,
-		[switch] $AsSystem = $false,
-		[switch] $CopyProgramToRemoteSystem = $false,
-		[switch] $ForceCopyProgramToRemoteSystem = $false
-	)
+    [CmdletBinding(SupportsShouldProcess=$True)]
+    param
+    (
+        [string[]] $ComputerName,
+        [string] $Program,
+        [string] $CommandLine,
+        [switch] $AsSystem = $false,
+        [switch] $CopyProgramToRemoteSystem = $false,
+        [switch] $ForceCopyProgramToRemoteSystem = $false
+    )
 
-	$Function = $MyInvocation.MyCommand
-	Write-Verbose "Entering $Function"
+    $Function = $MyInvocation.MyCommand
+    Write-Verbose "Entering $Function"
 
-	$returnobject = @()
-	$RemoteRegistryStarted = $false
-	$WhatIfPassed = $false
-	$Status = ""
-	$Reason = ""
-	$ReturnValue = $null
+    $returnobject = @()
+    $RemoteRegistryStarted = $false
+    $WhatIfPassed = $false
+    $Status = ""
+    $Reason = ""
+    $ReturnValue = $null
 
-	Write-Verbose "Using PsExec for starting '$Program' on '$ComputerName'."
+    Write-Verbose "Using PsExec for starting '$Program' on '$ComputerName'."
 
-	$Arguments = "Program: $Program, CommandLine: $CommandLine, AsSystem: $AsSystem, CopyFile: $CopyProgramToRemoteSystem, ForceCopy: $ForceCopyProgramToRemoteSystem"
+    $Arguments = "Program: $Program, CommandLine: $CommandLine, AsSystem: $AsSystem, CopyFile: $CopyProgramToRemoteSystem, ForceCopy: $ForceCopyProgramToRemoteSystem"
 
-	$ComputerName = Get-Target -ComputerName:$(if ($ComputerName){$ComputerName})
+    $ComputerName = Get-Target -ComputerName:$(if ($ComputerName){$ComputerName})
 
-	if ($PSBoundParameters.ContainsKey('whatif') -and $PSBoundParameters['whatif'])
-	{
-		$WhatIfPassed = $true
-	}
-	Write-Verbose "whatif: $WhatIfPassed"
+    if ($PSBoundParameters.ContainsKey('whatif') -and $PSBoundParameters['whatif'])
+    {
+        $WhatIfPassed = $true
+    }
+    Write-Verbose "whatif: $WhatIfPassed"
 
-	# Enable and start RemoteRegistry
-	try
-	{
-		# Enable RemoteRegistry for psexec
-		$params = @{
-			'method' = "external";
-			'ComputerName' = $ComputerName;
-			'WhatIf' = $WhatIfPassed;
-			'OnlineCheck' = $false
-		}
-		$err = Enable-RemoteRegistry @params
-		$returnobject += $err
-		$params = @{
-			'ComputerName' = $ComputerName;
-			'method' = "external";
-			'WhatIf' = $WhatIfPassed;
-			'Name' = "RemoteRegistry";
-			'OnlineCheck' = $false
-		}
-		$srr = Start-Service @params
-		$returnobject += $srr
-		$RemoteRegistryStarted = ($srr.status -match "pass")
-	}
-	catch
-	{
-		$Status = "fail"
-		$Reason = "Error while enabling RemoteRegistry"
-		$returnobject += New-PowerSponseObject -Function $Function -Status $Status -Reason $Reason
-	}
+    # Enable and start RemoteRegistry
+    try
+    {
+        # Enable RemoteRegistry for psexec
+        $params = @{
+            'method' = "external";
+            'ComputerName' = $ComputerName;
+            'WhatIf' = $WhatIfPassed;
+            'OnlineCheck' = $false
+        }
+        $err = Enable-RemoteRegistry @params
+        $returnobject += $err
+        $params = @{
+            'ComputerName' = $ComputerName;
+            'method' = "external";
+            'WhatIf' = $WhatIfPassed;
+            'Name' = "RemoteRegistry";
+            'OnlineCheck' = $false
+        }
+        $srr = Start-Service @params
+        $returnobject += $srr
+        $RemoteRegistryStarted = ($srr.status -match "pass")
+    }
+    catch
+    {
+        $Status = "fail"
+        $Reason = "Error while enabling RemoteRegistry"
+        $returnobject += New-PowerSponseObject -Function $Function -Status $Status -Reason $Reason
+    }
 
-	if ($pscmdlet.ShouldProcess($ComputerName, "Execute $Program $CommandLine"))
-	{
-		if ($RemoteRegistryStarted)
-		{
-			Write-Progress -Activity "Running $Function" -Status "Run '$Program $CommandLine' on $ComputerName..."
+    if ($pscmdlet.ShouldProcess($ComputerName, "Execute $Program $CommandLine"))
+    {
+        if ($RemoteRegistryStarted)
+        {
+            Write-Progress -Activity "Running $Function" -Status "Run '$Program $CommandLine' on $ComputerName..."
 
-			$CommandLinePsExec  = "-accepteula -nobanner "
-			$CommandLinePsExec += "\\$ComputerName "
-			if ($AsSystem) {
-				$CommandLinePsExec += "-s "
-			}
-			if ($CopyProgramToRemoteSystem)
-			{
-				$CommandLinePsExec += "-c "
-			}
-			if ($ForceCopyProgramToRemoteSystem)
-			{
-				$CommandLinePsExec += "-f "
-			}
-			$CommandLinePsExec += "`"$Program`" $CommandLine"
+            $CommandLinePsExec  = "-accepteula -nobanner "
+            $CommandLinePsExec += "\\$ComputerName "
+            if ($AsSystem) {
+                $CommandLinePsExec += "-s "
+            }
+            if ($CopyProgramToRemoteSystem)
+            {
+                $CommandLinePsExec += "-c "
+            }
+            if ($ForceCopyProgramToRemoteSystem)
+            {
+                $CommandLinePsExec += "-f "
+            }
+            $CommandLinePsExec += "`"$Program`" $CommandLine"
 
-			Write-Verbose "Using CommandLine for PsExec: $CommandLinePsExec"
+            Write-Verbose "Using CommandLine for PsExec: $CommandLinePsExec"
 
-			$params = @{
-			   'Binary' = "PsExec.exe";
-			   'CommandLine' = $CommandLinePsExec
-			}
+            $params = @{
+               'Binary' = "PsExec.exe";
+               'CommandLine' = $CommandLinePsExec
+            }
 
-			$ReturnValue = (Start-Process @params)
+            $ReturnValue = (Start-Process @params)
 
-			if ($ReturnValue.exitcode -eq 0)
-			{
-				$Status = "pass"
-				$Reason = "See stdout/stderr in return value."
-			}
-			else
-			{
-				$Status = "fail"
-				$Reason = "Error running '$Program $CommandLine' on $ComputerName. Wrong arguments or could be due to permissions. See stdout/stderr from return value."
-			}
-		}
-		else
-		{
-			$Status = "fail"
-			$Reason = "RemoteRegistry could not be started."
-		}
-	} #no whatif given
-	else
-	{
-		$Status = "pass"
-		$Reason = "Not executed - started with -WhatIf"
-	} #whatif used
+            if ($ReturnValue.exitcode -eq 0)
+            {
+                $Status = "pass"
+                $Reason = "See stdout/stderr in return value."
+            }
+            else
+            {
+                $Status = "fail"
+                $Reason = "Error running '$Program $CommandLine' on $ComputerName. Wrong arguments or could be due to permissions. See stdout/stderr from return value."
+            }
+        }
+        else
+        {
+            $Status = "fail"
+            $Reason = "RemoteRegistry could not be started."
+        }
+    } #no whatif given
+    else
+    {
+        $Status = "pass"
+        $Reason = "Not executed - started with -WhatIf"
+    } #whatif used
 
-	# Stop and Disable RemoteRegistry
-	if ($RemoteRegistryStarted -or $WhatIfPassed)
-	{
-		try
-		{
-			Write-Verbose "Cleanup RemoteRegistry on $ComputerName"
-			$srr = Stop-Service -ComputerName $ComputerName -method external -Name "RemoteRegistry" -WhatIf:$WhatIfPassed -OnlineCheck:$false
-			$returnobject += $srr
-			$drr = Disable-RemoteRegistry -method external -ComputerName $ComputerName -WhatIf:$WhatIfPassed -OnlineCheck:$false
-			$returnobject += $drr
-		}
-		catch
-		{
-			$Status = "fail"
-			$Reason = "Error while disabling RemoteRegistry"
-		}
-	}
+    # Stop and Disable RemoteRegistry
+    if ($RemoteRegistryStarted -or $WhatIfPassed)
+    {
+        try
+        {
+            Write-Verbose "Cleanup RemoteRegistry on $ComputerName"
+            $srr = Stop-Service -ComputerName $ComputerName -method external -Name "RemoteRegistry" -WhatIf:$WhatIfPassed -OnlineCheck:$false
+            $returnobject += $srr
+            $drr = Disable-RemoteRegistry -method external -ComputerName $ComputerName -WhatIf:$WhatIfPassed -OnlineCheck:$false
+            $returnobject += $drr
+        }
+        catch
+        {
+            $Status = "fail"
+            $Reason = "Error while disabling RemoteRegistry"
+        }
+    }
 
-	$returnobject += New-PowerSponseObject -Function $Function -ComputerName $ComputerName -Arguments $Arguments -Status $Status -Reason $Reason
+    $returnobject += New-PowerSponseObject -Function $Function -ComputerName $ComputerName -Arguments $Arguments -Status $Status -Reason $Reason
 
-	# returnobject with all powersponse objects and return value from psexec call
-	$returnobject,$ReturnValue
+    # returnobject with all powersponse objects and return value from psexec call
+    $returnobject,$ReturnValue
 
-	Write-Verbose "Leaving $($MyInvocation.MyCommand)"
+    Write-Verbose "Leaving $($MyInvocation.MyCommand)"
 }
 
 Function Get-Process()
 {
-	[CmdletBinding(SupportsShouldProcess=$True,DefaultParameterSetName='BySearchString')]
-	param
-	(
-		[string[]] $ComputerName,
+    [CmdletBinding(SupportsShouldProcess=$True,DefaultParameterSetName='BySearchString')]
+    param
+    (
+        [string[]] $ComputerName,
 
-		[string] $ComputerList,
+        [string] $ComputerList,
 
-		[ValidateSet("WMI", "External", "WinRM")]
-		[string] $Method = "WMI",
+        [ValidateSet("WMI", "External", "WinRM")]
+        [string] $Method = "WMI",
 
-		[string] $BinPath = $(Join-Path -Path $ModuleRoot -ChildPath "\bin"),
+        [string] $BinPath = $(Join-Path -Path $ModuleRoot -ChildPath "\bin"),
 
-		[System.Management.Automation.Runspaces.PSSession[]] $Session=$Null,
+        [System.Management.Automation.Runspaces.PSSession[]] $Session=$Null,
 
-		[System.Management.Automation.PSCredential] $Credential=$Null,
+        [System.Management.Automation.PSCredential] $Credential=$Null,
 
-		[Parameter(ParameterSetName='BySearchString')]
-		[string] $SearchString,
+        [Parameter(ParameterSetName='BySearchString')]
+        [string] $SearchString,
 
-		[Parameter(ParameterSetName='ByPid')]
-		[int] $Pid,
+        [Parameter(ParameterSetName='ByPid')]
+        [int] $Pid,
 
-		[ValidateSet("OnlyPid", "OnlyName", "All")]
-		[string] $OutputFormat = "all"
-	)
+        [ValidateSet("OnlyPid", "OnlyName", "All")]
+        [string] $OutputFormat = "all"
+    )
 
-	$Function = $MyInvocation.MyCommand
-	Write-Verbose "Entering $Function"
+    $Function = $MyInvocation.MyCommand
+    Write-Verbose "Entering $Function"
 
-	$returnobject = @()
+    $returnobject = @()
     $res = ""
 
-	$Arguments = $(if ($SearchString) { "SearchString $($SearchString)" } else { "Pid: $($Pid)" } )
+    $Arguments = $(if ($SearchString) { "SearchString $($SearchString)" } else { "Pid: $($Pid)" } )
 
-	Write-Progress -Activity "Running $Function" -Status "Initializing..."
+    Write-Progress -Activity "Running $Function" -Status "Initializing..."
 
-	if (!$SearchString -and !$Pid)
-	{
-		$Reason = "no process name or process id"
-		$Status = "fail"
-		$returnobject += New-PowerSponseObject -Function $Function -Status $Status -Reason $Reason -Arguments $Arguments
-	}
-	elseif ($SearchString -and $Pid)
-	{
-		$Status = "fail"
-		$Reason = "both process name or process id given"
-		$returnobject += New-PowerSponseObject -Function $Function -Status $Status -Reason $Reason -Arguments $Arguments
-	}
-	else
-	{
-		$targets = Get-Target -ComputerList:$(if ($ComputerList){$ComputerList}) -ComputerName:$(if ($ComputerName){$ComputerName})
+    if (!$SearchString -and !$Pid)
+    {
+        $Reason = "no process name or process id"
+        $Status = "fail"
+        $returnobject += New-PowerSponseObject -Function $Function -Status $Status -Reason $Reason -Arguments $Arguments
+    }
+    elseif ($SearchString -and $Pid)
+    {
+        $Status = "fail"
+        $Reason = "both process name or process id given"
+        $returnobject += New-PowerSponseObject -Function $Function -Status $Status -Reason $Reason -Arguments $Arguments
+    }
+    else
+    {
+        $targets = Get-Target -ComputerList:$(if ($ComputerList){$ComputerList}) -ComputerName:$(if ($ComputerName){$ComputerName})
 
-		foreach ($target in $targets)
-		{
-			Write-Progress -Activity "Running $Function" -Status "Processing $target..."
+        foreach ($target in $targets)
+        {
+            Write-Progress -Activity "Running $Function" -Status "Processing $target..."
 
-			if ($pscmdlet.ShouldProcess($target, "Get process with method $($Method)"))
-			{
-				if (!(Test-Connection $target -Quiet -Count 1))
-				{
-					Write-Verbose "$target is offline"
-					$Status = "fail"
-					$Reason = "offline"
-				}
-				else
-				{
-					if ($Method -match "wmi")
-					{
-						Write-Verbose "Using WMI"
+            if ($pscmdlet.ShouldProcess($target, "Get process with method $($Method)"))
+            {
+                if (!(Test-Connection $target -Quiet -Count 1))
+                {
+                    Write-Verbose "$target is offline"
+                    $Status = "fail"
+                    $Reason = "offline"
+                }
+                else
+                {
+                    if ($Method -match "wmi")
+                    {
+                        Write-Verbose "Using WMI"
 
-						if (($target -eq "localhost") -and $Credential)
-						{
-							$Status = "fail"
-							$Reason = "localhost and WMI and credential not working"
-							$returnobject += New-PowerSponseObject -Function $Function -Status $Status -Reason $Reason -Arguments $Arguments -ComputerName $target
-							Continue
-						}
-						try
-						{
-							if ($SearchString)
-							{
-								$res = Get-WmiObject Win32_Process -ComputerName $target -Credential $Credential -ErrorAction Stop | ? {$_.name -match $SearchString -or $_.ExecutablePath -match $SearchString}
-							}
-							else
-							{
-								$res = Get-WmiObject Win32_Process -ComputerName $target -Credential $Credential -ErrorAction stop | ? {$_.Processid -eq $Pid}
-							}
+                        if (($target -eq "localhost") -and $Credential)
+                        {
+                            $Status = "fail"
+                            $Reason = "localhost and WMI and credential not working"
+                            $returnobject += New-PowerSponseObject -Function $Function -Status $Status -Reason $Reason -Arguments $Arguments -ComputerName $target
+                            Continue
+                        }
+                        try
+                        {
+                            if ($SearchString)
+                            {
+                                $res = Get-WmiObject Win32_Process -ComputerName $target -Credential $Credential -ErrorAction Stop | ? {$_.name -match $SearchString -or $_.ExecutablePath -match $SearchString}
+                            }
+                            else
+                            {
+                                $res = Get-WmiObject Win32_Process -ComputerName $target -Credential $Credential -ErrorAction stop | ? {$_.Processid -eq $Pid}
+                            }
 
-							if (!$res)
-							{
-								$Status = "fail"
-								$Reason = "no process found"
-							}
-							# not used currently to distinguish between one or multiple processes
-							#elseif ((($res | measure).count -gt 1 ))
-							#{
-							#	$Status = "fail"
-							#	$Reason = "multiple processes found"
-							#}
-							else
-							{
-								$Status = "pass"
-								$Reason = @()
+                            if (!$res)
+                            {
+                                $Status = "fail"
+                                $Reason = "no process found"
+                            }
+                            # not used currently to distinguish between one or multiple processes
+                            #elseif ((($res | measure).count -gt 1 ))
+                            #{
+                            #    $Status = "fail"
+                            #    $Reason = "multiple processes found"
+                            #}
+                            else
+                            {
+                                $Status = "pass"
+                                $Reason = @()
 
-								foreach ($proc in $res)
-								{
-									if ($OutputFormat -match "OnlyPid")
-									{
-									 $Reason += "$($proc.ProcessId)"
-									}
-									elseif ($OutputFormat -match "OnlyName")
-									{
-										$Reason += "$($proc.ProcessName)"
-									}
-									else
-									{
-										$Reason += "$($proc.ProcessId) ; $($proc.ProcessName) ; $($proc.ExecutablePath)"
-									}
-								}
-							}
-						} # wmi call Successfull
-						catch
-						{
-							$Status = "fail"
-							$Reason = "error while connecting to remote host"
-						}
-					}
-					elseif ($Method -match "winrm")
-					{
+                                foreach ($proc in $res)
+                                {
+                                    if ($OutputFormat -match "OnlyPid")
+                                    {
+                                     $Reason += "$($proc.ProcessId)"
+                                    }
+                                    elseif ($OutputFormat -match "OnlyName")
+                                    {
+                                        $Reason += "$($proc.ProcessName)"
+                                    }
+                                    else
+                                    {
+                                        $Reason += "$($proc.ProcessId) ; $($proc.ProcessName) ; $($proc.ExecutablePath)"
+                                    }
+                                }
+                            }
+                        } # wmi call Successfull
+                        catch
+                        {
+                            $Status = "fail"
+                            $Reason = "error while connecting to remote host"
+                        }
+                    }
+                    elseif ($Method -match "winrm")
+                    {
                         Write-Verbose "Using WinRM - SearchString: $SearchString, Id: $Pid"
 
                         try
-						{
-							if ($SearchString)
-							{
-						        if ($target -eq "localhost" -and $Credential)
-                                {
-                                    $res = invoke-command -Credential $Credential -ScriptBlock {param($p1)Microsoft.PowerShell.Management\get-process -name "$p1"} -ArgumentList $SearchString -ea SilentlyContinue
-                                }
-                                elseif ($target -eq "localhost")
-                                {
-                                    $res = invoke-command -ScriptBlock {param($p1)Microsoft.PowerShell.Management\get-process -name "$p1"} -ArgumentList $SearchString -ea SilentlyContinue
-                                }
-                                elseif ($Credential)
-                                {
-                                    $res = invoke-command -ComputerName $target -Credential $Credential -ScriptBlock {param($p1)Microsoft.PowerShell.Management\get-process -name "$p1"} -ArgumentList $SearchString -ea SilentlyContinue
-                                }
-                                else
-                                {
-                                    $res = invoke-command -ComputerName $target -ScriptBlock {param($p1)Microsoft.PowerShell.Management\get-process -name "$p1"} -ArgumentList $SearchString -ea SilentlyContinue
-                                }
-							}
-							else
-							{
-						        if ($target -eq "localhost" -and $Credential)
-                                {
-                                    $res = invoke-command -Credential $Credential -ScriptBlock {param($p1)Microsoft.PowerShell.Management\get-process -id $p1} -ArgumentList $pid -ea SilentlyContinue
-                                }
-                                elseif ($target -eq "localhost")
-                                {
-                                    $res = invoke-command -ScriptBlock {param($p1)Microsoft.PowerShell.Management\get-process -id $p1} -ArgumentList $pid -ea SilentlyContinue
-                                }
-                                elseif ($Credential)
-                                {
-                                    $res = invoke-command -ComputerName $target -Credential $Credential -ScriptBlock {param($p1)Microsoft.PowerShell.Management\get-process -id $p1} -ArgumentList $pid -ea SilentlyContinue
-                                }
-                                else
-                                {
-                                    $res = invoke-command -ComputerName $target -ScriptBlock {param($p1)Microsoft.PowerShell.Management\get-process -Id $p1} `
-                                        -ArgumentList $pid -ea SilentlyContinue
-                                }
-							}
+                        {
+                            $params = @{
+                                'ea' = 'SilentlyContinue'
+                            }
 
-							if (!$res)
-							{
-								$Status = "fail"
-								$Reason = "no process found"
-							}
-							# not used currently to distinguish between one or multiple processes
-							#elseif ((($res | measure).count -gt 1 ))
-							#{
-							#	$Status = "fail"
-							#	$Reason = "multiple processes found"
-							#}
-							else
-							{
-								$Status = "pass"
-								$Reason = @()
+                            if ($target -ne "localhost")
+                            {
+                                $params += @{
+                                    'ComputerName' = $target
+                                    'SessionOption' = (New-PSSessionOption -NoMachineProfile)
+                                }
+                            }
 
-								foreach ($proc in $res)
-								{
-									if ($OutputFormat -match "OnlyPid")
-									{
-									 $Reason += "$($proc.Id)"
-									}
-									elseif ($OutputFormat -match "OnlyName")
-									{
-										$Reason += "$($proc.ProcessName)"
-									}
-									else
-									{
-										$Reason += "$($proc.Id) ; $($proc.ProcessName) ; $($proc.Path)"
-									}
-								}
-							}
+                            if ($Credential)
+                            {
+                                $params += @{
+                                    'Credential' = $Credential
+                                }
+                            }
+
+                            if ($SearchString)
+                            {
+                                $params += @{
+                                    'ScriptBlock' = {param($p1) Microsoft.PowerShell.Management\get-process -name "$p1"}
+                                    'ArgumentList' = $SearchString
+                                }
+                            }
+                            else
+                            {
+                                $params += @{
+                                    'ScriptBlock' = {param($p1) Microsoft.PowerShell.Management\get-process -Id $p1}
+                                    'ArgumentList' = $pid
+                                }
+                            }
+
+                            $params
+
+                            $res = invoke-command @params
+
+                            if (!$res)
+                            {
+                                $Status = "fail"
+                                $Reason = "no process found"
+                            }
+                            else
+                            {
+                                $Status = "pass"
+                                $Reason = @()
+
+                                foreach ($proc in $res)
+                                {
+                                    if ($OutputFormat -match "OnlyPid")
+                                    {
+                                     $Reason += "$($proc.Id)"
+                                    }
+                                    elseif ($OutputFormat -match "OnlyName")
+                                    {
+                                        $Reason += "$($proc.ProcessName)"
+                                    }
+                                    else
+                                    {
+                                        $Reason += "$($proc.Id) ; $($proc.ProcessName) ; $($proc.Path)"
+                                    }
+                                }
+                            }
                         }
-						catch
-						{
-							$Status = "fail"
-							$Reason = "error while connecting to remote host"
-						}
-					}
-					elseif ($Method -match "external")
-					{
-						Write-Verbose "Using ExternalTools / Sysinternals"
-						Write-Verbose "BinPath: $BinPath"
+                        catch
+                        {
+                            $Status = "fail"
+                            $Reason = "error while connecting to remote host"
+                        }
+                    }
+                    elseif ($Method -match "external")
+                    {
+                        Write-Verbose "Using ExternalTools / Sysinternals"
+                        Write-Verbose "BinPath: $BinPath"
 
-						if (!(Test-Path -Path "$BinPath\pslist.exe"))
-						{
-							$Status = "fail"
-							$Reason = "Binary pslist not found."
-						}
-						elseif (!(Test-Path -Path "$BinPath\psservice.exe"))
-						{
-							$Status = "fail"
-							$Reason = "Binary psservice not found."
-						}
-						else
-						{
-							# Enable RemoteRegistry for the target
-							try
-							{
-								$res = Enable-RemoteRegistry -Method external -ComputerName $target -OnlineCheck:$false
-								if ($res.status -match "pass")
-								{
-									Start-Service -ComputerName $target -Method external -Name "RemoteRegistry" -OnlineCheck:$false
-									$RemoteRegistryStarted = $true
-									
-									# todo pslist - check if multiple processes are running
-									if ($SearchString)
-									{
-										$proc = Start-Process "pslist.exe" "-accepteula -nobanner \\$target $SearchString"
-									}
-									else
-									{
-										$proc = Start-Process "pslist.exe" "-accepteula -nobanner \\$target $Pid"
-									}
+                        if (!(Test-Path -Path "$BinPath\pslist.exe"))
+                        {
+                            $Status = "fail"
+                            $Reason = "Binary pslist not found."
+                        }
+                        elseif (!(Test-Path -Path "$BinPath\psservice.exe"))
+                        {
+                            $Status = "fail"
+                            $Reason = "Binary psservice not found."
+                        }
+                        else
+                        {
+                            # Enable RemoteRegistry for the target
+                            try
+                            {
+                                $res = Enable-RemoteRegistry -Method external -ComputerName $target -OnlineCheck:$false
+                                if ($res.status -match "pass")
+                                {
+                                    Start-Service -ComputerName $target -Method external -Name "RemoteRegistry" -OnlineCheck:$false
+                                    $RemoteRegistryStarted = $true
+                                    
+                                    # todo pslist - check if multiple processes are running
+                                    if ($SearchString)
+                                    {
+                                        $proc = Start-Process "pslist.exe" "-accepteula -nobanner \\$target $SearchString"
+                                    }
+                                    else
+                                    {
+                                        $proc = Start-Process "pslist.exe" "-accepteula -nobanner \\$target $Pid"
+                                    }
 
-									if ($proc.stdout | select-string "not" -quiet)
-									{
-										$Reason = "Process not found"
-										$Status = "fail"
-									}
-									else
-									{
-										Write-Verbose "Process found"
-										# todo if needed use
-										# http://stackoverflow.com/questions/28287700/how-to-pipe-elapsed-time-or-other-output-from-pslist
-										$MultipleProcesses = (($proc.stdout | measure -Line).Lines -gt 4)
-										Write-Verbose "Process count: $($MultipleProcesses)"
-										$Status = "pass"
-										#$val = ($stdout.split("`n") | select -skip 2]
-										$Reason = $proc.stdout
-									}
+                                    if ($proc.stdout | select-string "not" -quiet)
+                                    {
+                                        $Reason = "Process not found"
+                                        $Status = "fail"
+                                    }
+                                    else
+                                    {
+                                        Write-Verbose "Process found"
+                                        # todo if needed use
+                                        # http://stackoverflow.com/questions/28287700/how-to-pipe-elapsed-time-or-other-output-from-pslist
+                                        $MultipleProcesses = (($proc.stdout | measure -Line).Lines -gt 4)
+                                        Write-Verbose "Process count: $($MultipleProcesses)"
+                                        $Status = "pass"
+                                        #$val = ($stdout.split("`n") | select -skip 2]
+                                        $Reason = $proc.stdout
+                                    }
 
-									if ($proc.ExitCode -eq 0)
-									{
-										Write-Verbose "Successfully executed pslist on $target"
-									}
-									else
-									{
-										Write-Verbose  "Error while running pslist on $target"
-									}
+                                    if ($proc.ExitCode -eq 0)
+                                    {
+                                        Write-Verbose "Successfully executed pslist on $target"
+                                    }
+                                    else
+                                    {
+                                        Write-Verbose  "Error while running pslist on $target"
+                                    }
 
-								} # Enable-RemoteRegistry pass
-								else
-								{
-									Write-Verbose "Error while enabling RemoteRegistry"
-									$Reason = "Error while enabling RemoteRegistry"
-									$Status = "fail"
-								}
+                                } # Enable-RemoteRegistry pass
+                                else
+                                {
+                                    Write-Verbose "Error while enabling RemoteRegistry"
+                                    $Reason = "Error while enabling RemoteRegistry"
+                                    $Status = "fail"
+                                }
 
-							} # no exception during enabling RemoteRegistry
-							catch
-							{
-								Write-Verbose "Error while enabling RemoteRegistry"
-								$Reason = "Error while enabling RemoteRegistry"
-								$Status = "fail"
-							}
+                            } # no exception during enabling RemoteRegistry
+                            catch
+                            {
+                                Write-Verbose "Error while enabling RemoteRegistry"
+                                $Reason = "Error while enabling RemoteRegistry"
+                                $Status = "fail"
+                            }
 
-							try
-							{
-								# Cleanup
-								if ($RemoteRegistryStarted)
-								{
-									Write-Verbose "Cleanup RemoteRegistry"
-									Stop-Service -ComputerName $target -Method external -Name "RemoteRegistry" -OnlineCheck:$false
-									Disable-RemoteRegistry -Method external -ComputerName $target -OnlineCheck:$false
-								}
-							}
-							catch
-							{
-								Write-Verbose "Error while disabling RemoteRegistry"
-								#fix when process found but disabling failed, info accordi
-								$Reason = "Error while disabling RemoteRegistry"
-								$Status = "fail"
-							}
+                            try
+                            {
+                                # Cleanup
+                                if ($RemoteRegistryStarted)
+                                {
+                                    Write-Verbose "Cleanup RemoteRegistry"
+                                    Stop-Service -ComputerName $target -Method external -Name "RemoteRegistry" -OnlineCheck:$false
+                                    Disable-RemoteRegistry -Method external -ComputerName $target -OnlineCheck:$false
+                                }
+                            }
+                            catch
+                            {
+                                Write-Verbose "Error while disabling RemoteRegistry"
+                                #fix when process found but disabling failed, info accordi
+                                $Reason = "Error while disabling RemoteRegistry"
+                                $Status = "fail"
+                            }
 
-						} #Binaries available
+                        } #Binaries available
 
-					} #UseExternal
+                    } #UseExternal
 
-				} #target online
+                } #target online
 
-				$returnobject += New-PowerSponseObject -Function $Function -Status $Status -Reason $Reason -Arguments $Arguments -ComputerName $target
+                $returnobject += New-PowerSponseObject -Function $Function -Status $Status -Reason $Reason -Arguments $Arguments -ComputerName $target
 
-			} #whatif
+            } #whatif
 
-		} #each target
+        } #each target
 
-	} #parameters ok
+    } #parameters ok
 
-	$returnobject
-	Write-Verbose "Leaving $($MyInvocation.MyCommand)"
+    $returnobject
+    Write-Verbose "Leaving $($MyInvocation.MyCommand)"
 }
 
 #
@@ -478,405 +470,405 @@ Function Get-Process()
 # Kansa and Invoke-LiveResponse first for this task.
 Function Start-Process()
 {
-	[CmdletBinding(SupportsShouldProcess=$True)]
-	param
-	(
-		[string] $Binary,
-		[string] $CommandLine = "",
-		[string] $BinPath = $(Join-Path -Path $ModuleRoot -ChildPath "\bin")
-	)
+    [CmdletBinding(SupportsShouldProcess=$True)]
+    param
+    (
+        [string] $Binary,
+        [string] $CommandLine = "",
+        [string] $BinPath = $(Join-Path -Path $ModuleRoot -ChildPath "\bin")
+    )
 
-	$Function = $MyInvocation.MyCommand
-	Write-Verbose "Entering $Function"
+    $Function = $MyInvocation.MyCommand
+    Write-Verbose "Entering $Function"
 
-	$return = @()
+    $return = @()
 
-	$Arguments = "BinPath: $BinPath, Binary: $Binary, CommandLine: $CommandLine"
-	Write-Verbose "Arguments: $Arguments"
+    $Arguments = "BinPath: $BinPath, Binary: $Binary, CommandLine: $CommandLine"
+    Write-Verbose "Arguments: $Arguments"
 
-	if (!$Binary)
-	{
-		$Status = "fail"
-		$Reason = "Binary $Binary not given."
-		write-output $Reason
-		return
-	}
+    if (!$Binary)
+    {
+        $Status = "fail"
+        $Reason = "Binary $Binary not given."
+        write-output $Reason
+        return
+    }
 
-	if (Test-Path "$BinPath\$Binary")
-	{
-		$Path = "$BinPath\$Binary"
-	}
-	else
-	{
-		$Path = $Binary
-	}
-	Write-Verbose $Path
+    if (Test-Path "$BinPath\$Binary")
+    {
+        $Path = "$BinPath\$Binary"
+    }
+    else
+    {
+        $Path = $Binary
+    }
+    Write-Verbose $Path
 
-	if ($pscmdlet.ShouldProcess("Execute Binary $Path with CommandLine $CommandLine"))
-	{
-		$pinfo = New-Object System.Diagnostics.ProcessStartInfo
-		$pinfo.FileName = "$Path"
-		$pinfo.RedirectStandardError = $true
-		$pinfo.RedirectStandardOutput = $true
-		$pinfo.UseShellExecute = $false
-		$pinfo.Arguments = "$CommandLine"
-		$p = New-Object System.Diagnostics.Process
-		$p.StartInfo = $pinfo
+    if ($pscmdlet.ShouldProcess("Execute Binary $Path with CommandLine $CommandLine"))
+    {
+        $pinfo = New-Object System.Diagnostics.ProcessStartInfo
+        $pinfo.FileName = "$Path"
+        $pinfo.RedirectStandardError = $true
+        $pinfo.RedirectStandardOutput = $true
+        $pinfo.UseShellExecute = $false
+        $pinfo.Arguments = "$CommandLine"
+        $p = New-Object System.Diagnostics.Process
+        $p.StartInfo = $pinfo
 
-		try
-		{
-			$p.Start() | Out-Null
-			# todo fix timeout
-			$p.WaitForExit(5000) | Out-Null
+        try
+        {
+            $p.Start() | Out-Null
+            # todo fix timeout
+            $p.WaitForExit(5000) | Out-Null
 
-			$stdout = $p.StandardOutput.ReadToEnd()
-			$stderr = $p.StandardError.ReadToEnd()
+            $stdout = $p.StandardOutput.ReadToEnd()
+            $stderr = $p.StandardError.ReadToEnd()
 
-			$info = [ordered]@{
-				ExitCode = $p.ExitCode
-				stdout = $stdout
-				stderr = $stderr
-			}
-		}
-		catch
-		{
-			$info = [ordered]@{
-				ExitCode = 1
-				stdout = ""
-				stderr = "Error starting $Binary, binary not found in path or bin folder"
-			}
-		}
-		$ret = New-Object -TypeName PSObject -Property $info
-		$return += $ret
-	} #whatif
-	$return
-	Write-Verbose "Leaving $($MyInvocation.MyCommand)"
+            $info = [ordered]@{
+                ExitCode = $p.ExitCode
+                stdout = $stdout
+                stderr = $stderr
+            }
+        }
+        catch
+        {
+            $info = [ordered]@{
+                ExitCode = 1
+                stdout = ""
+                stderr = "Error starting $Binary, binary not found in path or bin folder"
+            }
+        }
+        $ret = New-Object -TypeName PSObject -Property $info
+        $return += $ret
+    } #whatif
+    $return
+    Write-Verbose "Leaving $($MyInvocation.MyCommand)"
 } # Start-Process
 
 Function Stop-Process()
 {
-	[CmdletBinding(SupportsShouldProcess=$True,DefaultParameterSetName='ByName')]
-	param
-	(
-		[string[]] $ComputerName,
+    [CmdletBinding(SupportsShouldProcess=$True,DefaultParameterSetName='ByName')]
+    param
+    (
+        [string[]] $ComputerName,
 
-		[string] $ComputerList,
+        [string] $ComputerList,
 
-		[ValidateSet("WMI", "External")]
-		[string] $Method = "WMI",
+        [ValidateSet("WMI", "External")]
+        [string] $Method = "WMI",
 
-		[string] $BinPath = $(Join-Path -Path $ModuleRoot -ChildPath "\bin"),
+        [string] $BinPath = $(Join-Path -Path $ModuleRoot -ChildPath "\bin"),
 
-		[System.Management.Automation.Runspaces.PSSession[]] $Session=$Null,
+        [System.Management.Automation.Runspaces.PSSession[]] $Session=$Null,
 
-		[System.Management.Automation.PSCredential] $Credential=$Null,
+        [System.Management.Automation.PSCredential] $Credential=$Null,
 
-		[switch] $NoRemoteRegistry,
+        [switch] $NoRemoteRegistry,
 
-		[boolean] $OnlineCheck = $true,
+        [boolean] $OnlineCheck = $true,
 
-		[Parameter(ParameterSetName='ByName')]
-		[string] $Name,
+        [Parameter(ParameterSetName='ByName')]
+        [string] $Name,
 
-		[Parameter(ParameterSetName='ByPid')]
-		[int] $Pid,
+        [Parameter(ParameterSetName='ByPid')]
+        [int] $Pid,
 
-		[switch] $StopAll
+        [switch] $StopAll
 
-	)
+    )
 
-	$Function = $MyInvocation.MyCommand
-	Write-Verbose "Entering $Function"
+    $Function = $MyInvocation.MyCommand
+    Write-Verbose "Entering $Function"
 
-	$returnobject = @()
+    $returnobject = @()
 
-	$Arguments = $(if ($Name) { "Name $($Name)" } else { "Pid: $($Pid)" } )
-	$Arguments += ", StopAll: $StopAll"
-	$Arguments += ", Onlinecheck: $OnlineCheck"
-	Write-Verbose "Arguments: $Arguments"
+    $Arguments = $(if ($Name) { "Name $($Name)" } else { "Pid: $($Pid)" } )
+    $Arguments += ", StopAll: $StopAll"
+    $Arguments += ", Onlinecheck: $OnlineCheck"
+    Write-Verbose "Arguments: $Arguments"
 
-	if ($PSBoundParameters.ContainsKey('whatif') -and $PSBoundParameters['whatif'])
-	{
-		$WhatIfPassed = $true
-	}
-	else
-	{
-		$WhatIfPassed = $false
-	}
-	Write-Verbose "whatif: $WhatIfPassed"
+    if ($PSBoundParameters.ContainsKey('whatif') -and $PSBoundParameters['whatif'])
+    {
+        $WhatIfPassed = $true
+    }
+    else
+    {
+        $WhatIfPassed = $false
+    }
+    Write-Verbose "whatif: $WhatIfPassed"
 
-	if ($PSBoundParameters.ContainsKey('NoRemoteRegistry') -and $PSBoundParameters['NoRemoteRegistry'])
-	{
-		$NoRemoteRegistry = $true
-	}
-	else
-	{
-		$NoRemoteRegistry = $false
-	}
-	Write-Verbose "NoRemoteRegistry $NoRemoteRegistry"
+    if ($PSBoundParameters.ContainsKey('NoRemoteRegistry') -and $PSBoundParameters['NoRemoteRegistry'])
+    {
+        $NoRemoteRegistry = $true
+    }
+    else
+    {
+        $NoRemoteRegistry = $false
+    }
+    Write-Verbose "NoRemoteRegistry $NoRemoteRegistry"
 
-	if (!$Name -and !$Pid)
-	{
-		 $Status = "fail"
-		 $Reason = "no process name or process id"
-		 $returnobject += New-PowerSponseObject -Function $Function -Status $Status -Reason $Reason -Arguments $Arguments
-	}
-	elseif ($Name -and $Pid)
-	{
-		 $Status = "fail"
-		 $Reason = "both process name or process id given"
-		 $returnobject += New-PowerSponseObject -Function $Function -Status $Status -Reason $Reason -Arguments $Arguments
-	}
-	else
-	{
-		$targets = Get-Target -ComputerList:$(if ($ComputerList){$ComputerList}) -ComputerName:$(if ($ComputerName){$ComputerName})
+    if (!$Name -and !$Pid)
+    {
+         $Status = "fail"
+         $Reason = "no process name or process id"
+         $returnobject += New-PowerSponseObject -Function $Function -Status $Status -Reason $Reason -Arguments $Arguments
+    }
+    elseif ($Name -and $Pid)
+    {
+         $Status = "fail"
+         $Reason = "both process name or process id given"
+         $returnobject += New-PowerSponseObject -Function $Function -Status $Status -Reason $Reason -Arguments $Arguments
+    }
+    else
+    {
+        $targets = Get-Target -ComputerList:$(if ($ComputerList){$ComputerList}) -ComputerName:$(if ($ComputerName){$ComputerName})
 
-		foreach ($target in $targets)
-		{
-			Write-Progress -Activity "Running $Function" -Status "Processing $target..."
-			if ($pscmdlet.ShouldProcess($target, "Stop Process with method $($Method)"))
-			{
-				$IsLocalhost = ($target -match "localhost")
-				if (!$IsLocalhost -and $OnlineCheck -and !(Test-Connection $target -Quiet -Count 2))
-				{
-					Write-Verbose "$target is offline"
-					$Status = "fail"
-					$Reason = "offline"
-				}
-				else
-				{
-					if ($Method -match "wmi")
-					{
-						Write-Verbose "Using WMI"
+        foreach ($target in $targets)
+        {
+            Write-Progress -Activity "Running $Function" -Status "Processing $target..."
+            if ($pscmdlet.ShouldProcess($target, "Stop Process with method $($Method)"))
+            {
+                $IsLocalhost = ($target -match "localhost")
+                if (!$IsLocalhost -and $OnlineCheck -and !(Test-Connection $target -Quiet -Count 2))
+                {
+                    Write-Verbose "$target is offline"
+                    $Status = "fail"
+                    $Reason = "offline"
+                }
+                else
+                {
+                    if ($Method -match "wmi")
+                    {
+                        Write-Verbose "Using WMI"
 
-						if (($target -eq "localhost") -and $Credential)
-						{
-							$Status = "fail"
-							$Reason = "localhost and WMI and credential not working"
-							$returnobject += New-PowerSponseObject -Function $function -Status $Status -Reason $Reason -Arguments $Arguments -ComputerName $target
-							Continue
-						}
+                        if (($target -eq "localhost") -and $Credential)
+                        {
+                            $Status = "fail"
+                            $Reason = "localhost and WMI and credential not working"
+                            $returnobject += New-PowerSponseObject -Function $function -Status $Status -Reason $Reason -Arguments $Arguments -ComputerName $target
+                            Continue
+                        }
 
-						if ($Name)
-						{
-							$res = Get-WmiObject Win32_Process -ComputerName $target -Credential $Credential | ? {$_.name -match $Name}
-						}
-						else
-						{
-							$res = Get-WmiObject Win32_Process -ComputerName $target -Credential $Credential | ? {$_.Processid -eq $Pid}
-						}
+                        if ($Name)
+                        {
+                            $res = Get-WmiObject Win32_Process -ComputerName $target -Credential $Credential | ? {$_.name -match $Name}
+                        }
+                        else
+                        {
+                            $res = Get-WmiObject Win32_Process -ComputerName $target -Credential $Credential | ? {$_.Processid -eq $Pid}
+                        }
 
-						if (!$res)
-						{
-							$Status = "fail"
-							$Reason = "no process"
-						}
-						elseif ((($res | measure).count -gt 1 ) -and !$StopAll)
-						{
-							$Status = "fail"
-							$Reason = "multiple processes without -stopall"
-						}
-						else
-						{
-							$Reason = "Process(es) stopped: "
-							foreach ($proc in $res)
-							{
-								$rval = $proc.terminate().returnvalue
-								if ($rval -eq 0)
-								{
-									$Status = "pass"
-									$Reason += "PID:$($proc.ProcessId)($($proc.ProcessName)) "
-								}
-								elseif ($rval -eq 2)
-								{
-									$Status = "fail"
-									$Reason += "$($proc.ProcessPid)(Access denied)"
-								}
-								else
-								{
-									$Status = "fail"
-									$Reason += "$($proc.ProcessPid)(Unspecified error)"
-								}
-							}
-						}
-					}
-					elseif ($Method -match "winrm")
-					{
-					}
-					elseif ($Method -match "external")
-					{
-						Write-Verbose "Using ExternalTools / Sysinternals"
-						Write-Verbose "BinPath: $BinPath"
+                        if (!$res)
+                        {
+                            $Status = "fail"
+                            $Reason = "no process"
+                        }
+                        elseif ((($res | measure).count -gt 1 ) -and !$StopAll)
+                        {
+                            $Status = "fail"
+                            $Reason = "multiple processes without -stopall"
+                        }
+                        else
+                        {
+                            $Reason = "Process(es) stopped: "
+                            foreach ($proc in $res)
+                            {
+                                $rval = $proc.terminate().returnvalue
+                                if ($rval -eq 0)
+                                {
+                                    $Status = "pass"
+                                    $Reason += "PID:$($proc.ProcessId)($($proc.ProcessName)) "
+                                }
+                                elseif ($rval -eq 2)
+                                {
+                                    $Status = "fail"
+                                    $Reason += "$($proc.ProcessPid)(Access denied)"
+                                }
+                                else
+                                {
+                                    $Status = "fail"
+                                    $Reason += "$($proc.ProcessPid)(Unspecified error)"
+                                }
+                            }
+                        }
+                    }
+                    elseif ($Method -match "winrm")
+                    {
+                    }
+                    elseif ($Method -match "external")
+                    {
+                        Write-Verbose "Using ExternalTools / Sysinternals"
+                        Write-Verbose "BinPath: $BinPath"
 
-						if (!(Test-Path -Path "$BinPath\pskill.exe"))
-						{
-							$Status = "fail"
-							$Reason = "Binary pskill not found."
-						}
-						elseif (!(Test-Path -Path "$BinPath\pslist.exe"))
-						{
-							$Status = "fail"
-							$Reason = "Binary pslist not found."
-						}
-						elseif (!(Test-Path -Path "$BinPath\psservice.exe"))
-						{
-							$Status = "fail"
-							$Reason = "Binary psservice not found."
-						}
-						else
-						{
-							# Enable RemoteRegistry for the target
-							try
-							{
-								if (!$IsLocalhost -and !$NoRemoteRegistry -or (!$IsLocalhost -and $WhatIfPassed))
-								{
-									$err = Enable-RemoteRegistry -Method external -ComputerName $target -OnlineCheck:$false -WhatIf:$WhatIfPassed
+                        if (!(Test-Path -Path "$BinPath\pskill.exe"))
+                        {
+                            $Status = "fail"
+                            $Reason = "Binary pskill not found."
+                        }
+                        elseif (!(Test-Path -Path "$BinPath\pslist.exe"))
+                        {
+                            $Status = "fail"
+                            $Reason = "Binary pslist not found."
+                        }
+                        elseif (!(Test-Path -Path "$BinPath\psservice.exe"))
+                        {
+                            $Status = "fail"
+                            $Reason = "Binary psservice not found."
+                        }
+                        else
+                        {
+                            # Enable RemoteRegistry for the target
+                            try
+                            {
+                                if (!$IsLocalhost -and !$NoRemoteRegistry -or (!$IsLocalhost -and $WhatIfPassed))
+                                {
+                                    $err = Enable-RemoteRegistry -Method external -ComputerName $target -OnlineCheck:$false -WhatIf:$WhatIfPassed
 
-									$returnobject += $err
-									$srr = Start-Service -ComputerName $target -Method external -Name "RemoteRegistry" -OnlineCheck:$false -WhatIf:$WhatIfPassed
-									$returnobject += $srr
-									$RemoteRegistryStarted = ($srr.status -match "pass")
-								}
-								else
-								{
-									# assume RemoteRegistry is already started
-									$RemoteRegistryStarted = $true
-								}
+                                    $returnobject += $err
+                                    $srr = Start-Service -ComputerName $target -Method external -Name "RemoteRegistry" -OnlineCheck:$false -WhatIf:$WhatIfPassed
+                                    $returnobject += $srr
+                                    $RemoteRegistryStarted = ($srr.status -match "pass")
+                                }
+                                else
+                                {
+                                    # assume RemoteRegistry is already started
+                                    $RemoteRegistryStarted = $true
+                                }
 
-								# pslist - check if multiple processes are running
-								if ($Name)
-								{
-									if ($IsLocalhost)
-									{
-										$proc = Start-Process pslist.exe -CommandLine "-accepteula -nobanner $Name"
-									}
-									else
-									{
-										$proc = Start-Process pslist.exe -CommandLine "-accepteula -nobanner \\$target $Name"
-									}
-								}
-								else
-								{
-									if ($IsLocalhost)
-									{
-										$proc = Start-Process pslist.exe -CommandLine "-accepteula -nobanner $Pid"
-									}
-									else
-									{
-										$proc = Start-Process pslist.exe -CommandLine "-accepteula -nobanner \\$target $Pid"
-									}
-								}
+                                # pslist - check if multiple processes are running
+                                if ($Name)
+                                {
+                                    if ($IsLocalhost)
+                                    {
+                                        $proc = Start-Process pslist.exe -CommandLine "-accepteula -nobanner $Name"
+                                    }
+                                    else
+                                    {
+                                        $proc = Start-Process pslist.exe -CommandLine "-accepteula -nobanner \\$target $Name"
+                                    }
+                                }
+                                else
+                                {
+                                    if ($IsLocalhost)
+                                    {
+                                        $proc = Start-Process pslist.exe -CommandLine "-accepteula -nobanner $Pid"
+                                    }
+                                    else
+                                    {
+                                        $proc = Start-Process pslist.exe -CommandLine "-accepteula -nobanner \\$target $Pid"
+                                    }
+                                }
 
-								if ($proc.stdout | select-string "not" -quiet)
-								{
-									$Reason = "Process not found"
-									$Status = "fail"
-								}
-								elseif ($proc.stdout -match "Cannot connect" -or $proc.stdout -match "failed")
-								{
-									$Reason = "Failed to connected to remote host"
-									$Status = "fail"
-								}
-								else
-								{
-									Write-Verbose "Process found"
-									$MultipleProcesses = (($proc.stdout | measure -Line).Lines -gt 4)
-									Write-Verbose "Process count: $($MultipleProcesses)"
-									if ($MultipleProcesses -and !$StopAll)
-									{
-										$Reason = "multiple processes found, please use -stopall to stop all processes"
-										$Status = "fail"
-									}
-									else
-									{
-										# pskill
-										if ($Name)
-										{
-											if ($IsLocalhost)
-											{
-												$proc = Start-Process pskill.exe -CommandLine "-accepteula -nobanner $Name"
-											}
-											else
-											{
-												$proc = Start-Process pskill.exe -CommandLine "-accepteula -nobanner \\$target $Name"
-											}
-										}
-										else
-										{
-											if ($IsLocalhost)
-											{
-												$proc = Start-Process pskill.exe -CommandLine "-accepteula -nobanner -t $Pid"
-											}
-											else
-											{
-												$proc = Start-Process pskill.exe -CommandLine "-accepteula -nobanner -t \\$target $Pid"
-											}
-										}
+                                if ($proc.stdout | select-string "not" -quiet)
+                                {
+                                    $Reason = "Process not found"
+                                    $Status = "fail"
+                                }
+                                elseif ($proc.stdout -match "Cannot connect" -or $proc.stdout -match "failed")
+                                {
+                                    $Reason = "Failed to connected to remote host"
+                                    $Status = "fail"
+                                }
+                                else
+                                {
+                                    Write-Verbose "Process found"
+                                    $MultipleProcesses = (($proc.stdout | measure -Line).Lines -gt 4)
+                                    Write-Verbose "Process count: $($MultipleProcesses)"
+                                    if ($MultipleProcesses -and !$StopAll)
+                                    {
+                                        $Reason = "multiple processes found, please use -stopall to stop all processes"
+                                        $Status = "fail"
+                                    }
+                                    else
+                                    {
+                                        # pskill
+                                        if ($Name)
+                                        {
+                                            if ($IsLocalhost)
+                                            {
+                                                $proc = Start-Process pskill.exe -CommandLine "-accepteula -nobanner $Name"
+                                            }
+                                            else
+                                            {
+                                                $proc = Start-Process pskill.exe -CommandLine "-accepteula -nobanner \\$target $Name"
+                                            }
+                                        }
+                                        else
+                                        {
+                                            if ($IsLocalhost)
+                                            {
+                                                $proc = Start-Process pskill.exe -CommandLine "-accepteula -nobanner -t $Pid"
+                                            }
+                                            else
+                                            {
+                                                $proc = Start-Process pskill.exe -CommandLine "-accepteula -nobanner -t \\$target $Pid"
+                                            }
+                                        }
 
-										if (($proc.stderr).Contains("verweigert") -or ($proc.stderr).Contains("denied"))
-										{
-											$Reason = "Access denied while stopping"
-											$Status = "fail"
-										}
-										elseif (!($proc.stdout).Contains("Error") -and ($proc.stdout).contains("killed"))
-										{
-											$Reason = "Process stopped."
-											$Status = "pass"
-										}
-										else
-										{
-											$Reason = "Unspecified error."
-											$Status = "fail"
-										}
-										if ($proc.ExitCode -eq 0)
-										{
-											Write-Verbose "Successfully executed pskill on $target"
-										}
-										else
-										{
-											Write-Verbose  "Error while running pskill on $target"
-										}
-									}
-								}
-							}
-							catch
-							{
-								Write-Verbose "Error while enabling RemoteRegistry"
-								$Reason = "Error while enabling RemoteRegistry"
-								$Status = "fail"
-							}
-							try
-							{
-								if (!$IsLocalhost -and !$NoRemoteRegistry -and $RemoteRegistryStarted -or (!$IsLocalhost -and $WhatIfPassed))
-								{
-									Write-Verbose "Cleanup RemoteRegistry"
-									$srr = Stop-Service -ComputerName $target -Method external -Name "RemoteRegistry" -OnlineCheck:$false -WhatIf:$WhatIfPassed
-									$returnobject += $srr
-									$drr = Disable-RemoteRegistry -Method external -ComputerName $target -OnlineCheck:$false -WhatIf:$WhatIfPassed
-									$returnobject += $drr
-								}
-							}
-							catch
-							{
-								Write-Verbose "Error while disabling RemoteRegistry"
-								$Reason = "Error while disabling RemoteRegistry"
-								$Status = "fail"
-							}
-						} #Binaries found
+                                        if (($proc.stderr).Contains("verweigert") -or ($proc.stderr).Contains("denied"))
+                                        {
+                                            $Reason = "Access denied while stopping"
+                                            $Status = "fail"
+                                        }
+                                        elseif (!($proc.stdout).Contains("Error") -and ($proc.stdout).contains("killed"))
+                                        {
+                                            $Reason = "Process stopped."
+                                            $Status = "pass"
+                                        }
+                                        else
+                                        {
+                                            $Reason = "Unspecified error."
+                                            $Status = "fail"
+                                        }
+                                        if ($proc.ExitCode -eq 0)
+                                        {
+                                            Write-Verbose "Successfully executed pskill on $target"
+                                        }
+                                        else
+                                        {
+                                            Write-Verbose  "Error while running pskill on $target"
+                                        }
+                                    }
+                                }
+                            }
+                            catch
+                            {
+                                Write-Verbose "Error while enabling RemoteRegistry"
+                                $Reason = "Error while enabling RemoteRegistry"
+                                $Status = "fail"
+                            }
+                            try
+                            {
+                                if (!$IsLocalhost -and !$NoRemoteRegistry -and $RemoteRegistryStarted -or (!$IsLocalhost -and $WhatIfPassed))
+                                {
+                                    Write-Verbose "Cleanup RemoteRegistry"
+                                    $srr = Stop-Service -ComputerName $target -Method external -Name "RemoteRegistry" -OnlineCheck:$false -WhatIf:$WhatIfPassed
+                                    $returnobject += $srr
+                                    $drr = Disable-RemoteRegistry -Method external -ComputerName $target -OnlineCheck:$false -WhatIf:$WhatIfPassed
+                                    $returnobject += $drr
+                                }
+                            }
+                            catch
+                            {
+                                Write-Verbose "Error while disabling RemoteRegistry"
+                                $Reason = "Error while disabling RemoteRegistry"
+                                $Status = "fail"
+                            }
+                        } #Binaries found
 
-					} #external
+                    } #external
 
-				} #online
+                } #online
 
-				$returnobject += New-PowerSponseObject -Function $Function -Status $Status -Reason $Reason -Arguments $Arguments -ComputerName $target
+                $returnobject += New-PowerSponseObject -Function $Function -Status $Status -Reason $Reason -Arguments $Arguments -ComputerName $target
 
-			} # whatif
+            } # whatif
 
-		} # each target
+        } # each target
 
-	} # params ok
+    } # params ok
 
-	$returnobject
-	Write-Verbose "Leaving $($MyInvocation.MyCommand)"
+    $returnobject
+    Write-Verbose "Leaving $($MyInvocation.MyCommand)"
 
 } #Stop-Process
