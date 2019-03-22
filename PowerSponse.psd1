@@ -92,7 +92,8 @@ FunctionsToExport = @(
 	'Set-PowerSponseRepository',
 	'Import-PowerSponseRepository',
 	'Get-FileHandle',
-    'Invoke-PsExec'
+    'Invoke-PsExec',
+    'Find-File'
 	)
 
 # Cmdlets to export from this module

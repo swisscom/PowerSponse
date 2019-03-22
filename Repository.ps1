@@ -91,16 +91,15 @@ $Script:Repository = @{
 	}
 #>
 
-<# NOT IMPLEMENTED YET
 	FileItem  = @{
 		DefaultAction = "Find"
-		DefaultMethod = "WMI"
+		DefaultMethod = "WinRM"
 		Actions = @("Find", "Remove")
 		ActionFind = "Find-File"
-		Methods = @("WMI", "External")
+		Methods = @("WinRM")
 		Parameter = @{
-			Path = "-Path"
-			Name = "-Name"
+			File = "-File"
+        }
 	}
 #>
 

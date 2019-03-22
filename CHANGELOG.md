@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
     The function returns both the PowerSponse objects (fail/pass, timestamp,
     ...) and the program output (exit code, stdout, stderr).
 * Add WinRM implementation for `Get-Process`
+* Add WinRM implementation for `Find-File`. The use of wildcards like * is
+    possible.
 ### Changed
 * Use `Invoke-PsExec` inside of `Get-Autoruns`. Therefore, the whole handling
     of RemoteRegistry is not needed in `Get-Autoruns` and all code is inside
