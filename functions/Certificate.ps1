@@ -17,7 +17,7 @@ Function Get-Certificate()
 
 		[System.Management.Automation.PSCredential] $Credential=$Null,
 
-		[boolean] $OnlineCheck = $true,
+		[boolean] $OnlineCheck = $false,
 
 		[string] $SearchString
 
@@ -112,29 +112,54 @@ Function Get-Certificate()
 						{
 							try
 							{
-								Invoke-command -ComputerName $target -Credential $Credential -ScriptBlock { $Certs = Get-ChildItem -Path Cert:\ -Recurse }
+                                $params += @{
+                                    'ea' = 'Stop'
+                                }
+
+                                if ($target -ne "localhost")
+                                {
+                                    $params += @{
+                                        'ComputerName' = $target
+                                        'SessionOption' = (New-PSSessionOption -NoMachineProfile)
+                                    }
+                                }
+
+                                if ($Credential)
+                                {
+                                    $params += @{
+                                        'Credential' = $Credential
+                                    }
+                                }
+
+                                $params += @{
+                                    'ScriptBlock' = { Get-ChildItem -Path Cert:\ -Recurse -ea SilentlyContinue}
+                                }
+                                $Certs = Invoke-Command @params
 							}
 							Catch
 							{
 								$Status = "fail"
-								$Reason = "Exception raised"
+								$Reason = "Exception raised: $($_.Exception.Message)"
 							}
 						}
 
-						$FoundCerts = $Certs | ?  { $_.PSParentPath -match "$SearchString" -or $_.FriendlyName -match "$SearchString" -or $_.Issuer -match "$SearchString" -or $_.Subject -match "$SearchString" }
-						$res = $FoundCerts | Select-Object -Property PSParentPath, FriendlyName, NotBefore, NotAfter, SerialNumber, ThumbPrint, Issuer, Subject, Version
-
-						if (!$res)
+                    	if ($Certs)
 						{
-							$Status = "fail"
-							$Reason = "no certificate found"
+							$Status = "pass"
+
+                            $FoundCerts = $Certs | ?  { $_.PSParentPath -match "$SearchString" -or $_.FriendlyName -match "$SearchString" -or $_.Issuer -match "$SearchString" -or $_.Subject -match "$SearchString" }
+                            $res = $FoundCerts | Select-Object -Property PSParentPath, FriendlyName, NotBefore, NotAfter, SerialNumber, ThumbPrint, Issuer, Subject, Version
+
+							$Reason = $($res)
 						}
 						else
 						{
-							$Status = "pass"
-							$Reason = $($res)
+							$Status = "fail"
+							$Reason = "failed to retrieve certificates"
 						}
-					} #whatif
+
+
+										} #whatif
 					else
 					{
 						$Status = "pass"

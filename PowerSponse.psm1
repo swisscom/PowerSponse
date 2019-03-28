@@ -577,7 +577,8 @@ Export-ModuleMember @(
 	'Get-FileHandle',
     'Invoke-PsExec',
     'Find-File',
-    'Find-Directory'
+    'Find-Directory',
+    'Get-Certificate'
 )
 
 #endregion
