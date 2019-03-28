@@ -21,6 +21,7 @@ Enable-ScheduledTask	.\functions\ScheduledTask.ps1	/^function Enable-ScheduledTa
 Enable-Service	.\functions\Services.ps1	/^Function Enable-Service()$/;"	m
 Find-Directory	.\functions\File.ps1	/^Function Find-Directory()$/;"	m
 Find-File	.\functions\File.ps1	/^Function Find-File()$/;"	m
+Find-FileSystemObject	.\functions\File.ps1	/^Function Find-FileSystemObject()$/;"	m
 Function-Template	.\functions\Template.ps1	/^Function Function-Template()$/;"	m
 Get-Autoruns	.\functions\Collection.ps1	/^function Get-Autoruns()$/;"	m
 Get-Certificate	.\functions\Certificate.ps1	/^Function Get-Certificate()$/;"	m
@@ -44,6 +45,7 @@ New-PowerSponseObject	.\functions\Support.ps1	/^function New-PowerSponseObject()
 Remove-Certificate	.\functions\Certificate.ps1	/^Function Remove-Certificate()$/;"	m
 Remove-Directory	.\functions\File.ps1	/^Function Remove-Directory()$/;"	m
 Remove-File	.\functions\File.ps1	/^Function Remove-File()$/;"	m
+Remove-FileSystemObject	.\functions\File.ps1	/^Function Remove-FileSystemObject()$/;"	m
 Remove-RegistryKey	.\functions\Registry.ps1	/^Function Remove-RegistryKey()$/;"	m
 Remove-ScheduledTask	.\functions\ScheduledTask.ps1	/^Function Remove-ScheduledTask()$/;"	m
 Remove-Service	.\functions\Services.ps1	/^Function Remove-Service()$/;"	m

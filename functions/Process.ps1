@@ -145,7 +145,7 @@ Function Invoke-PsExec()
 
 Function Get-Process()
 {
-    [CmdletBinding(SupportsShouldProcess=$True,DefaultParameterSetName='BySearchString')]
+    [CmdletBinding(SupportsShouldProcess=$True,DefaultParameterSetName='ByName')]
     param
     (
         [string[]] $ComputerName,
@@ -153,7 +153,7 @@ Function Get-Process()
         [string] $ComputerList,
 
         [ValidateSet("WMI", "External", "WinRM")]
-        [string] $Method = "WMI",
+        [string] $Method = "WinRM",
 
         [string] $BinPath = $(Join-Path -Path $ModuleRoot -ChildPath "\bin"),
 
@@ -161,8 +161,8 @@ Function Get-Process()
 
         [System.Management.Automation.PSCredential] $Credential=$Null,
 
-        [Parameter(ParameterSetName='BySearchString')]
-        [string] $SearchString,
+        [Parameter(ParameterSetName='ByName')]
+        [string] $Name,
 
         [Parameter(ParameterSetName='ByPid')]
         [int] $Pid,
@@ -177,17 +177,17 @@ Function Get-Process()
     $returnobject = @()
     $res = ""
 
-    $Arguments = $(if ($SearchString) { "SearchString $($SearchString)" } else { "Pid: $($Pid)" } )
+    $Arguments = $(if ($Name) { "Name $($Name)" } else { "Pid: $($Pid)" } )
 
     Write-Progress -Activity "Running $Function" -Status "Initializing..."
 
-    if (!$SearchString -and !$Pid)
+    if (!$Name -and !$Pid)
     {
-        $Reason = "no process name or process id"
+        $Reason = "no process name or process id, please use -Name or -Pid"
         $Status = "fail"
         $returnobject += New-PowerSponseObject -Function $Function -Status $Status -Reason $Reason -Arguments $Arguments
     }
-    elseif ($SearchString -and $Pid)
+    elseif ($Name -and $Pid)
     {
         $Status = "fail"
         $Reason = "both process name or process id given"
@@ -224,9 +224,9 @@ Function Get-Process()
                         }
                         try
                         {
-                            if ($SearchString)
+                            if ($Name)
                             {
-                                $res = Get-WmiObject Win32_Process -ComputerName $target -Credential $Credential -ErrorAction Stop | ? {$_.name -match $SearchString -or $_.ExecutablePath -match $SearchString}
+                                $res = Get-WmiObject Win32_Process -ComputerName $target -Credential $Credential -ErrorAction Stop | ? {$_.name -match $Name -or $_.ExecutablePath -match $Name}
                             }
                             else
                             {
@@ -274,7 +274,7 @@ Function Get-Process()
                     }
                     elseif ($Method -match "winrm")
                     {
-                        Write-Verbose "Using WinRM - SearchString: $SearchString, Id: $Pid"
+                        Write-Verbose "Using WinRM - Name: $Name, Id: $Pid"
 
                         try
                         {
@@ -297,24 +297,23 @@ Function Get-Process()
                                 }
                             }
 
-                            if ($SearchString)
+                            if ($Name)
                             {
                                 $params += @{
-                                    'ScriptBlock' = {param($p1) Microsoft.PowerShell.Management\get-process -name "$p1"}
-                                    'ArgumentList' = $SearchString
+                                    'ScriptBlock' = {Microsoft.PowerShell.Management\get-process -ea SilentlyContinue}
                                 }
+                                $res = invoke-command @params
+                                $res = $res | ? { $_.ProcessName -match "$Name" -or $_.Path -match "$Name" } | select Id,ProcessName,Path
                             }
                             else
                             {
                                 $params += @{
-                                    'ScriptBlock' = {param($p1) Microsoft.PowerShell.Management\get-process -Id $p1}
-                                    'ArgumentList' = $pid
+                                    'ScriptBlock' = {param($p1) Microsoft.PowerShell.Management\get-process -Id $p1 -ea SilentlyContinue}
+                                    'ArgumentList' = $Pid
                                 }
+
+                                $res = invoke-command @params
                             }
-
-                            $params
-
-                            $res = invoke-command @params
 
                             if (!$res)
                             {
@@ -374,11 +373,11 @@ Function Get-Process()
                                 {
                                     Start-Service -ComputerName $target -Method external -Name "RemoteRegistry" -OnlineCheck:$false
                                     $RemoteRegistryStarted = $true
-                                    
+
                                     # todo pslist - check if multiple processes are running
-                                    if ($SearchString)
+                                    if ($Name)
                                     {
-                                        $proc = Start-Process "pslist.exe" "-accepteula -nobanner \\$target $SearchString"
+                                        $proc = Start-Process "pslist.exe" "-accepteula -nobanner \\$target $Name"
                                     }
                                     else
                                     {
@@ -554,8 +553,8 @@ Function Stop-Process()
 
         [string] $ComputerList,
 
-        [ValidateSet("WMI", "External")]
-        [string] $Method = "WMI",
+        [ValidateSet("WMI", "External", "WinRM")]
+        [string] $Method = "WinRM",
 
         [string] $BinPath = $(Join-Path -Path $ModuleRoot -ChildPath "\bin"),
 
@@ -694,6 +693,73 @@ Function Stop-Process()
                     }
                     elseif ($Method -match "winrm")
                     {
+                        Write-Verbose "Using WinRM - Name: $Name, Id: $Pid"
+
+                        if ($Name)
+                        {
+                            $ret = Get-Process -ComputerName $target -Method WinRM -Name $Name
+                            $returnobject += $ret
+                        }
+                        else
+                        {
+                            $ret = Get-Process -ComputerName $target -Method WinRM -Pid $Pid
+                            $returnobject += $ret
+                        }
+
+                        if ($ret -and ($ret.reason -match "no process found"))
+                        {
+                            $Status = "fail"
+                            $Reason = "no process"
+                            Continue
+                        }
+                        elseif ($ret -and ($ret.reason | measure).count -gt 1 -and !$StopAll)
+                        {
+                            $Status = "fail"
+                            $Reason = "kill multiple processes without -stopall"
+                        }
+                        else
+                        {
+                            $processes = ( $ret.reason | foreach { ($_ -split ";")[0] } )
+
+                            $params = @{
+                                'ea' = 'SilentlyContinue'
+                            }
+
+                            if ($target -ne "localhost")
+                            {
+                                $params += @{
+                                    'ComputerName' = $target
+                                    'SessionOption' = (New-PSSessionOption -NoMachineProfile)
+                                }
+                            }
+
+                            if ($Credential)
+                            {
+                                $params += @{
+                                    'Credential' = $Credential
+                                }
+                            }
+
+                            $params += @{
+                                'ScriptBlock' = {param($p1) Microsoft.PowerShell.Management\stop-process -Id $p1 -force -PassThru -ea stop}
+                            }
+
+                            $Reason = @()
+                            foreach ($proc in $processes)
+                            {
+                                try
+                                {
+                                    $res = invoke-command @params -ArgumentList $proc
+                                    $Status = "pass"
+                                    $Reason += "$proc($($res.ProcessName))"
+                                }
+                                catch
+                                {
+                                    $Status = "fail"
+                                    $Reason += "can't kill process $($proc): $($_.Exception.Message)"
+                                }
+                            }
+                        }
                     }
                     elseif ($Method -match "external")
                     {

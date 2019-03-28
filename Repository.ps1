@@ -29,12 +29,12 @@ $Script:Repository = @{
 
 	ProcessItem = @{
 		DefaultAction = "Stop"
-		DefaultMethod = "WMI"
+		DefaultMethod = "WinRM"
 		Actions = @("Stop", "Get")
 		ActionStop = "Stop-Process"
 		# Get-Process uses param "SearchString"
 		ActionGet = "Get-Process"
-		Methods = @("WMI", "External")
+		Methods = @("WMI", "External","WinRM")
 		Parameter = @{
 			Name = "-Name"
 		}
@@ -91,6 +91,19 @@ $Script:Repository = @{
 	}
 #>
 
+	DirectoryItem  = @{
+		DefaultAction = "Find"
+		DefaultMethod = "WinRM"
+		Actions = @("Find", "Remove")
+		ActionFind = "Find-Directory"
+		Methods = @("WinRM")
+		Parameter = @{
+			File = "-Path"
+			Regex = "-Regex"
+			Recurse = "-Recurse"
+        }
+	}
+
 	FileItem  = @{
 		DefaultAction = "Find"
 		DefaultMethod = "WinRM"
@@ -98,7 +111,9 @@ $Script:Repository = @{
 		ActionFind = "Find-File"
 		Methods = @("WinRM")
 		Parameter = @{
-			File = "-File"
+			File = "-Path"
+			Regex = "-Regex"
+			Recurse = "-Recurse"
         }
 	}
 #>

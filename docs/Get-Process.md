@@ -13,11 +13,11 @@ Use regex for finding based on patterns.
 
 ## SYNTAX
 
-### BySearchString (Default)
+### ByName (Default)
 ```
 Get-Process [-ComputerName <String[]>] [-ComputerList <String>] [-Method <String>] [-BinPath <String>]
- [-Session <PSSession[]>] [-Credential <PSCredential>] [-SearchString <String>] [-OutputFormat <String>]
- [-WhatIf] [-Confirm] [<CommonParameters>]
+ [-Session <PSSession[]>] [-Credential <PSCredential>] [-Name <String>] [-OutputFormat <String>] [-WhatIf]
+ [-Confirm] [<CommonParameters>]
 ```
 
 ### ByPid
@@ -208,14 +208,12 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -SearchString
-Search for process name or a part in the executable 
-path according to the given searchstring. Regex can 
-be used for the searchstring.
+### -Name
+{{Fill Name Description}}
 
 ```yaml
 Type: String
-Parameter Sets: BySearchString
+Parameter Sets: ByName
 Aliases:
 
 Required: False
