@@ -96,6 +96,8 @@ FunctionsToExport = @(
     'Find-File',
     'Find-Directory',
     'Get-Certificate'
+    'Remove-File',
+    'Remove-Directory'
 	)
 
 # Cmdlets to export from this module

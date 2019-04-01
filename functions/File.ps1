@@ -1,20 +1,273 @@
 Function Remove-File()
 {
+	[CmdletBinding(SupportsShouldProcess=$True)]
+	param
+	(
+		[string[]] $ComputerName,
 
+		[string] $ComputerList,
+
+        [ValidateSet("WinRM")]
+        [string] $Method = "WinRM",
+
+		[System.Management.Automation.Runspaces.PSSession[]] $Session=$Null,
+
+		[System.Management.Automation.PSCredential] $Credential=$Null,
+
+		[string] $Path,
+		[switch] $Recurse,
+		[string] $Regex
+	)
+
+    $Function = $MyInvocation.MyCommand
+    Write-Verbose "Entering $Function"
+
+    $WhatIfPassed = $false
+	$returnobject = @()
+    $ret = ""
+	$Arguments = $Path
+
+    if ($PSBoundParameters.ContainsKey('whatif') -and $PSBoundParameters['whatif'])
+    {
+        $WhatIfPassed = $true
+    }
+    Write-Verbose "whatif: $WhatIfPassed"
+
+	if (!($Path))
+	{
+ 		$Reason = 'You have to provide a file path path with -Path'
+		$Status = "fail"
+ 		$returnobject += New-PowerSponseObject -Function $Function -Status $Status -Reason $Reason -Arguments $Arguments
+	}
+	else
+    {
+		$targets = Get-Target -ComputerList:$(if ($ComputerList){$ComputerList}) -ComputerName:$(if ($ComputerName){$ComputerName})
+
+	    Remove-FileSystemObject -targets $targets -Method:$Method -File -Path:$Path -Recurse:$Recurse -Regex:$Regex -WhatIf:$WhatIfPassed
+	}
+
+	$returnobject
+
+	Write-Verbose "Leaving $($MyInvocation.MyCommand)"
 }
 
 
 Function Remove-Directory()
 {
+	[CmdletBinding(SupportsShouldProcess=$True)]
+	param
+	(
+		[string[]] $ComputerName,
 
+		[string] $ComputerList,
+
+        [ValidateSet("WinRM")]
+        [string] $Method = "WinRM",
+
+		[System.Management.Automation.Runspaces.PSSession[]] $Session=$Null,
+
+		[System.Management.Automation.PSCredential] $Credential=$Null,
+
+		[string] $Path,
+		[switch] $Recurse,
+		[string] $Regex
+	)
+
+    $Function = $MyInvocation.MyCommand
+    Write-Verbose "Entering $Function"
+
+    $WhatIfPassed = $false
+	$returnobject = @()
+    $ret = ""
+	$Arguments = $Path
+
+    if ($PSBoundParameters.ContainsKey('whatif') -and $PSBoundParameters['whatif'])
+    {
+        $WhatIfPassed = $true
+    }
+    Write-Verbose "whatif: $WhatIfPassed"
+
+	if (!($Path))
+	{
+ 		$Reason = 'You have to provide a file path path with -Path'
+		$Status = "fail"
+ 		$returnobject += New-PowerSponseObject -Function $Function -Status $Status -Reason $Reason -Arguments $Arguments
+	}
+	else
+    {
+		$targets = Get-Target -ComputerList:$(if ($ComputerList){$ComputerList}) -ComputerName:$(if ($ComputerName){$ComputerName})
+
+	    Remove-FileSystemObject -targets $targets -Method:$Method -Path:$Path -Recurse:$Recurse -Regex:$Regex -WhatIf:$WhatIfPassed
+	}
+
+	$returnobject
+
+	Write-Verbose "Leaving $($MyInvocation.MyCommand)"
 }
 
 
-# todo -whatif
-# check fail saviness
 Function Remove-FileSystemObject()
 {
+	[CmdletBinding(SupportsShouldProcess=$True)]
+	param
+	(
+		[string[]] $targets,
 
+        [ValidateSet("WinRM")]
+        [string] $Method = "WinRM",
+
+		[System.Management.Automation.PSCredential] $Credential=$Null,
+
+		[string] $Path,
+		[switch] $Recurse,
+		[string] $Regex,
+		[switch] $File
+	)
+
+    $Function = $MyInvocation.MyCommand
+    Write-Verbose "Entering $Function"
+
+	$returnobject = @()
+    $ret = ""
+    $items = ""
+
+	$Arguments = "Path: $Path, File: $File, Recurse: $Recurse, Regex: $Regex"
+
+	if (!($Path))
+	{
+ 		$Reason = 'You have to provide a file path path with Path'
+		$Status = "fail"
+ 		$returnobject += New-PowerSponseObject -Function $Function -Status $Status -Reason $Reason -Arguments $Arguments
+	}
+	else
+	{
+		foreach ($target in $targets)
+		{
+            $params = @{}
+            $items = ""
+            $ret = ""
+
+            Write-Progress -Activity "Running $Function" -Status "Processing $Path with regex `"$Regex`" on $target..."
+
+            if (!(Test-Connection $target -Quiet -Count 1))
+            {
+                Write-Verbose "$target is offline"
+                $Status = "fail"
+                $Reason = "offline"
+            }
+            else
+            {
+                if ($Method -match "wmi")
+                {
+                    $Status = "fail"
+                    $Reason = "method not implemented yet"
+                }
+                elseif ($Method -match "winrm")
+                {
+                    Write-Verbose "Using WinRM - File: $Path, Regex: $Regex"
+
+                    $returnobject_temp = Find-FileSystemObject -File:$File -target $target -Method winrm -Path:$Path -Recurse:$Recurse -Regex:$Regex
+                    $returnobject += $returnobject_temp
+
+                    $items = $null
+
+                    if ($returnobject_temp -and $returnobject_temp.reason -notmatch "no ")
+                    {
+                        $items = $returnobject.reason.fullname
+                    }
+                    else
+                    {
+                        $Status = "pass"
+                        $Reason = "Nothing to remove."
+                        $returnobject += New-PowerSponseObject -Function $Function -Status $Status -Reason $Reason -Arguments $Arguments -ComputerName $target
+                        Continue
+                    }
+
+                    try
+                    {
+                        $params += @{
+                            'ea' = 'Stop'
+                        }
+
+                        if ($target -ne "localhost")
+                        {
+                            $params += @{
+                                'ComputerName' = $target
+                                'SessionOption' = (New-PSSessionOption -NoMachineProfile)
+                            }
+                        }
+
+                        if ($Credential)
+                        {
+                            $params += @{
+                                'Credential' = $Credential
+                            }
+                        }
+
+                        if ($PSBoundParameters.ContainsKey('whatif') -and $PSBoundParameters['whatif'])
+                        {
+                            $Status = "pass"
+                            $Reason = "WhatIf passed - nothing removed. See output of find function about removed items."
+ 			                $returnobject += New-PowerSponseObject -Function $Function -Status $Status -Reason $Reason -Arguments $Arguments -ComputerName $target
+                            Continue
+                        }
+
+                        $params += @{
+
+                            'ScriptBlock' = { `
+                                param($p1) $p1 | % { $item = $_; try { Microsoft.PowerShell.Management\Remove-Item `
+                                   -path "$item" `
+                                   -Recurse `
+                                   -force `
+                                   -WhatIf:$false `
+                                   -ea Stop} `
+                                   catch [System.Management.Automation.ItemNotFoundException] { "INFO - $item - $($_.Exception.Message) This is likely caused by using the -recurse option and when attempting to remove a child item after the parent item was removed already." } `
+                                   catch { "ERROR - $item - $($_.Exception.Message)" } `
+                                }
+                            }
+                            'ArgumentList' = (,$items)
+                        }
+
+                        $ret = invoke-command @params
+
+                        if (!($ret))
+                        {
+                            $Status = "pass"
+                            $Reason = "All files or directories removed. See output of find function about removed items."
+                        }
+                        elseif ($ret -match "ERROR")
+                        {
+                            $Status = "fail"
+                            $Reason += $ret
+                        }
+                        else
+                        {
+                            $Status = "pass"
+                            $Reason = "Remove command return with following information: "
+                            $Reason += $ret
+                        }
+                    }
+                    catch
+                    {
+                        $Status = "fail"
+                        $Reason = "$($_.Exception.Message)"
+                    }
+                }
+                elseif ($Method -match "external")
+                {
+                    $Status = "fail"
+                    $Reason = "method not implemented yet"
+                }
+            }
+
+ 			$returnobject += New-PowerSponseObject -Function $Function -Status $Status -Reason $Reason -Arguments $Arguments -ComputerName $target
+
+		} #foreach target
+	} #parameters are correct, process targets
+
+	$returnobject
+
+	Write-Verbose "Leaving $($MyInvocation.MyCommand)"
 }
 
 
@@ -57,7 +310,6 @@ Function Find-File()
     Write-Verbose "Entering $Function"
 
 	$returnobject = @()
-    $ret = ""
 
 	$Arguments = $Path
 
@@ -172,6 +424,7 @@ Function Find-FileSystemObject()
 		foreach ($target in $targets)
 		{
             $params = @{}
+            $ret = ""
 
             Write-Progress -Activity "Running $Function" -Status "Processing $Path with regex `"$Regex`" on $target..."
 
@@ -190,7 +443,7 @@ Function Find-FileSystemObject()
                 }
                 elseif ($Method -match "winrm")
                 {
-                    Write-Verbose "Using WinRM - File: $Path"
+                    Write-Verbose "Using WinRM - File: $Path, Regex: $Regex"
 
                     try
                     {
@@ -213,13 +466,51 @@ Function Find-FileSystemObject()
                             }
                         }
 
-                        $params += @{
-                            'ScriptBlock' = {param($p1,$p2,$p3) Microsoft.PowerShell.Management\get-childitem -Path "$p1" `
-                                                                                                      -Recurse:$(if($p2){$true}else{$false})`
-                                                                                                      -File:$(if($p3){$true}else{$false})`
-                                                                                                      -Directory:$(if($p3){$false}else{$true})`
+                        if ($File -and $Recurse)
+                        {
+                            $params += @{
+                                'ScriptBlock' = {param($p1,$p2,$p3) Microsoft.PowerShell.Management\get-childitem -Path "$p1" `
+                                                                                                      -Recurse `
+                                                                                                      -File `
+                                                                                                      -force `
+                                                                                                      -ea SilentlyContinue }
+                                'ArgumentList' = $Path
+                            }
+                        }
+                        elseif ($File)
+                        {
+                            $params += @{
+                                'ScriptBlock' = {param($p1,$p2,$p3) Microsoft.PowerShell.Management\get-item -Path "$p1" `
+                                                                                                      -ea SilentlyContinue `
+                                                                                                      -force `
+                                                                                                      | ? {$_.mode -notmatch "d.*"}}
+                                'ArgumentList' = $Path
+                            }
+                        }
+                        elseif (!($File) -and $Recurse)
+                        {
+                            $params += @{
+                                'ScriptBlock' = {param($p1,$p2,$p3) Microsoft.PowerShell.Management\get-childitem -Path "$p1" `
+                                                                                                      -Recurse `
+                                                                                                      -Directory `
+                                                                                                      -force `
                                                                                                       -ea SilentlyContinue}
-                            'ArgumentList' = $Path,$Recurse,$File
+                                'ArgumentList' = $Path
+                            }
+                        }
+                        elseif (!($File))
+                        {
+                            $params += @{
+                                'ScriptBlock' = {param($p1,$p2,$p3) Microsoft.PowerShell.Management\get-item -Path "$p1" `
+                                                                                                      -ea SilentlyContinue `
+                                                                                                      -force `
+                                                                                                      | ? {$_.mode -match "d.*"}}
+                                'ArgumentList' = $Path
+                            }
+                        }
+                        else
+                        {
+                            throw "that should not happen - switch without the truth... file an issue with your command on Github."
                         }
 
                         $ret = invoke-command @params
@@ -232,8 +523,8 @@ Function Find-FileSystemObject()
 
                         if (!$ret)
                         {
-                            $Status = "fail"
-                            $Reason = "no files found with $Path and regex `"$Regex`""
+                            $Status = "pass"
+                            $Reason = "no $(if ($File) {"files"}else{"folders"}) found with $Path and regex `"$Regex`""
                         }
                         else
                         {
@@ -242,7 +533,13 @@ Function Find-FileSystemObject()
 
                             foreach ($proc in $ret)
                             {
-                                $Reason += "FullName: $($proc.FullName) ; CreationTime: $($proc.CreationTime) ; LastWriteTime: $($proc.LastWriteTime), Length: $($proc.Length)"
+                                $info=[ordered]@{
+                                    FullName=$proc.FullName
+                                    CreationTime=$proc.CreationTime
+                                    LastWriteTime=$proc.LastWriteTime
+                                    Length=$proc.Length
+                                }
+                                $Reason += New-Object PSObject -Property $info
                             }
                         }
                     }

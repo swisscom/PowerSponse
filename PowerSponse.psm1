@@ -579,6 +579,8 @@ Export-ModuleMember @(
     'Find-File',
     'Find-Directory',
     'Get-Certificate'
+    'Remove-File',
+    'Remove-Directory'
 )
 
 #endregion

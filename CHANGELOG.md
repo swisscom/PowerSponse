@@ -5,6 +5,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased](https://github.com/swisscom/PowerSponse/compare/v0.1.0...master)
+
+Finally **add WinRM implementation for finding or removing files and
+directories based on simple wildcards like * at the end of the path or the use
+of regex which is matched against the whole path**. Furthermore, a generic
+command `Invoke-PsExec` was added for a more confinient way to invoke PsExec.
+Beside the WinRM implementations for file system handling, the get and stop
+process function got their WinRM implementation as well.
+
 ### Added
 * Add `Invoke-PsExec` for easier usage of PsExec and remote command execution.
     The function returns both the PowerSponse objects (fail/pass, timestamp,
@@ -14,6 +22,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 * Add WinRM implementation for `Find-File`. The use of wildcards like * and
   regex is possible.
 * Add WinRM implementation for `Find-Directory`. The use of wildcards like * and
+  regex is possible.
+* Add WinRM implementation for `Remove-File`. The use of wildcards like * and
+  regex is possible.
+* Add WinRM implementation for `Remove-Directory`. The use of wildcards like * and
   regex is possible.
 ### Changed
 * Use `Invoke-PsExec` inside of `Get-Autoruns`. Therefore, the whole handling

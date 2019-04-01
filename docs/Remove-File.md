@@ -1,50 +1,58 @@
 ---
 external help file: PowerSponse-help.xml
 Module Name: PowerSponse
-online version: https://github.com/swisscom/PowerSponse/blob/master/docs/Find-File.md
+online version: https://github.com/swisscom/PowerSponse/blob/master/docs/Remove-File.md
 schema: 2.0.0
 ---
 
-# Find-File
+# Remove-File
 
 ## SYNOPSIS
-Find files on remote host based on simple wildcards or with regex. Use the
-command against one or multiple hosts.
+Remove files based on wildcards at the end of the path or based on regex.
 
 ## SYNTAX
 
 ```
-Find-File [[-ComputerName] <String[]>] [[-ComputerList] <String>] [[-Method] <String>]
+Remove-File [[-ComputerName] <String[]>] [[-ComputerList] <String>] [[-Method] <String>]
  [[-Session] <PSSession[]>] [[-Credential] <PSCredential>] [[-Path] <String>] [-Recurse] [[-Regex] <String>]
  [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-Find files on remote host based on simple wildcards or with regex. Use the
-command against one or multiple hosts.
+Remove files based on wildcards at the end of the path or based on regex.
 
 ## EXAMPLES
 
 ### Example 1
 ```powershell
-PS C:\> Find-File -ComputerName host1 -Path C:\users\*\*.exe
+PS C:\> remove-file -ComputerName $target -path "C:\users\username\evil.exe"
 ```
 
-Search for .exe files within the users profile folder.
+Remove file based on regex. First every file is searched which matchs the path
+and the regex and then the remove function is called with the found files.
+
 
 ### Example 2
 ```powershell
-PS C:\> $ret = find-file -Path C:\Users\username\appdata\ -Regex "\d{6}.exe" -Recurse
-PS C:\> $ret
-PS C:\> $ret | select -ExpandProperty reason
+PS C:\> remove-file -ComputerName $target -path "C:\users\username\" -Recurse -Regex "\\\w{3}\."
 ```
 
-Search for files with given regex in all AppData subfolders on localhost.
+Remove file based on regex. First search for every file which matches the path
+and the regex in all folders and subfolders and then remove the found files.
+
+### Example 2
+```powershell
+PS C:\> remove-file -ComputerName $target -path "C:\users\username\" -Recurse -Regex "\\\w{3}\." | select -ExpandProperty reason
+```
+
+Remove file based on regex. First search for every file which matches the path
+and the regex in all folders and subfolders and then remove the found files.
+Select only the field 'reason' to see the full list of removed files.
 
 ## PARAMETERS
 
 ### -ComputerList
-List of target computers in a text file
+List of target computers in a file.
 
 ```yaml
 Type: String
@@ -59,7 +67,7 @@ Accept wildcard characters: False
 ```
 
 ### -ComputerName
-Target computer
+List of target computers.
 
 ```yaml
 Type: String[]
@@ -89,7 +97,7 @@ Accept wildcard characters: False
 ```
 
 ### -Credential
-Credentials used on remote host
+Credentials for remote computer.
 
 ```yaml
 Type: PSCredential
@@ -104,7 +112,7 @@ Accept wildcard characters: False
 ```
 
 ### -Method
-Currently not used. Only WinRM is implemented.
+Method used for remote access.
 
 ```yaml
 Type: String
@@ -120,7 +128,7 @@ Accept wildcard characters: False
 ```
 
 ### -Path
-Search path for files.
+Path to the file (filter with -Regex).
 
 ```yaml
 Type: String
@@ -135,7 +143,7 @@ Accept wildcard characters: False
 ```
 
 ### -Recurse
-Recursive search
+Should the search also include subfolders.
 
 ```yaml
 Type: SwitchParameter
@@ -150,7 +158,7 @@ Accept wildcard characters: False
 ```
 
 ### -Regex
-Regex pattern for file path
+Regex used for filtering.
 
 ```yaml
 Type: String
@@ -165,7 +173,7 @@ Accept wildcard characters: False
 ```
 
 ### -Session
-PowerShell session
+PSSession for remote access.
 
 ```yaml
 Type: PSSession[]
@@ -196,11 +204,13 @@ Accept wildcard characters: False
 ```
 
 ### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable.
+For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 
 ### Keine
+
 
 ## OUTPUTS
 
