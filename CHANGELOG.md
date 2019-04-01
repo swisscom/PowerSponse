@@ -17,8 +17,8 @@ process function got their WinRM implementation as well.
 * Add `Invoke-PsExec` for easier usage of PsExec and remote command execution.
     The function returns both the PowerSponse objects (fail/pass, timestamp,
     ...) and the program output (exit code, stdout, stderr).
-* Add WinRM implementation for `Get-Process`
-* Add WinRM implementation for `Stop-Process`
+* Add WinRM implementation for `Get-Process`. The use of regex is possible.
+* Add WinRM implementation for `Stop-Process`. The use of regex is possible.
 * Add WinRM implementation for `Find-File`. The use of wildcards like * and
   regex is possible.
 * Add WinRM implementation for `Find-Directory`. The use of wildcards like * and

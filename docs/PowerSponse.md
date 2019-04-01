@@ -38,6 +38,12 @@ Enable a scheduled task.
 ### [Enable-Service](Enable-Service.md)
 Enable a service.
 
+### [Find-Directory](Find-Directory.md)
+Find directory based on wildcards or regex.
+
+### [Find-File](Find-File.md)
+Find file based on wildcards or regex.
+
 ### [Get-Autoruns](Get-Autoruns.md)
 Collect Sysinternal's Autoruns output.
 
@@ -71,6 +77,12 @@ Executes a given program on a remote host.
 
 ### [New-CleanupPackage](New-CleanupPackage.md)
 Creates a new cleanup package.
+
+### [Remove-Directory](Remove-Directory.md)
+Remove directory based on wildcards or regex.
+
+### [Remove-File](Remove-File.md)
+Remove file based on wildcards or regex.
 
 ### [Restart-Computer](Restart-Computer.md)
 Restart a computer.
