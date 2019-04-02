@@ -174,7 +174,7 @@ that rule in combination with `Invoke-PowerSponse` or `New-CleanupPackage`.
                 },
                 {
                     "type" : "TaskItem",
-                    "Name" : "User_F.*_S.*-\\{.{8}-(.{4}-){3}.{12}\\}"
+                    "searchstring" : "User_F.*_S.*-\\{.{8}-(.{4}-){3}.{12}\\}"
                 },
                 {
                     "type" : "ComputerItem",
