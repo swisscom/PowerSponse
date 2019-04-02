@@ -5193,7 +5193,7 @@ Reason       : {4332 ; powershell.exe ; ...</dev:code>
     <command:examples>
       <command:example>
         <maml:title>-------------------------- Example 1 --------------------------</maml:title>
-        <dev:code>PS&gt; Get-ScheduledTask -TaskName ".*-S-\d{1}-\d{1}" -UseExternal -NoRemoteRegistry -OnlyTaskName
+        <dev:code>PS&gt; Get-ScheduledTask -SearchString ".*-S-\d{1}-\d{1}" -NoRemoteRegistry -OnlyTaskName
 
 
 Time         : 06.01.2017 10:31:29

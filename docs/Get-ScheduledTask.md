@@ -25,7 +25,7 @@ Find scheduled tasks based on regex.
 
 ### Example 1
 ```
-PS> Get-ScheduledTask -TaskName ".*-S-\d{1}-\d{1}" -UseExternal -NoRemoteRegistry -OnlyTaskName
+PS> Get-ScheduledTask -SearchString ".*-S-\d{1}-\d{1}" -NoRemoteRegistry -OnlyTaskName
 
 
 Time         : 06.01.2017 10:31:29

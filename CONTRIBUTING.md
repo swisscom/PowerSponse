@@ -68,8 +68,9 @@ Some general guidelines:
 1. Add a new Github release and add release notes
 1. Publish the new module version to PowerShell gallery
     * Make a clean folder for PowerSponse in the module path.
-    * Add the psm1, psd1, Repository.ps1, the folder functions and the external help (en-us) to that PowerSponse module
-        folder.
+    * Add the psm1, psd1, Repository.ps1, the bin folder only with versioned
+      files, the folder functions and the external help (en-us) to that
+      PowerSponse module folder.
     * Run the following command to publish the module to the PowerShell gallery.
     ``` powershell
     Publish-Module -Name PowerSponse -NuGetApiKey <apiKey> 
