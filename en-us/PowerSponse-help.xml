@@ -4388,9 +4388,16 @@ PS C:\&gt; $ret | select -ExpandProperty reason</dev:code>
     <command:examples>
       <command:example>
         <maml:title>-------------------------- Example 1 --------------------------</maml:title>
-        <dev:code>PS C:\&gt; {{ Add example code here }}</dev:code>
+        <dev:code>PS C:\&gt; Get-PowerSponseRule .\rules\emotet-20190325.xml</dev:code>
         <dev:remarks>
-          <maml:para>{{ Add example description here }}</maml:para>
+          <maml:para>Read given CoRe rule.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- Example 2 --------------------------</maml:title>
+        <dev:code>PS C:\&gt;  Get-PowerSponseRule .\rules\emotet-20190325.xml | select -ExpandProperty action | fl</dev:code>
+        <dev:remarks>
+          <maml:para>Read given CoRe rule and show all the defined actions and used parameters.</maml:para>
         </dev:remarks>
       </command:example>
     </command:examples>

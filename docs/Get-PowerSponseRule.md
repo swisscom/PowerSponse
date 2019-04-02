@@ -24,10 +24,17 @@ the CoRe rule syntax.
 
 ### Example 1
 ```
-PS C:\> {{ Add example code here }}
+PS C:\> Get-PowerSponseRule .\rules\emotet-20190325.xml
 ```
 
-{{ Add example description here }}
+Read given CoRe rule.
+
+### Example 2
+```
+PS C:\>  Get-PowerSponseRule .\rules\emotet-20190325.xml | select -ExpandProperty action | fl
+```
+
+Read given CoRe rule and show all the defined actions and used parameters.
 
 ## PARAMETERS
 

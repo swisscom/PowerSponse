@@ -44,6 +44,7 @@ way to invoke PsExec.
 * Add WinRM implementation for `Remove-Directory`. The use of wildcards like * and
   regex is possible.
 * Add example emotet CORE rule.
+* Add examples to `Get-PowerSponseRule` help 
 ### Changed
 * Use `Invoke-PsExec` inside of `Get-Autoruns`. Therefore, the whole handling
     of RemoteRegistry is not needed in `Get-Autoruns` and all code is inside
