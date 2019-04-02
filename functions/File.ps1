@@ -130,8 +130,9 @@ Function Remove-FileSystemObject()
 	$returnobject = @()
     $ret = ""
     $items = ""
+    $WhatIfPassed = ($PSBoundParameters.ContainsKey('whatif') -and $PSBoundParameters['whatif'])
 
-	$Arguments = "Path: $Path, File: $File, Recurse: $Recurse, Regex: $Regex"
+	$Arguments = "Path: $Path, File: $File, Recurse: $Recurse, Regex: $Regex, WhatIfPassed: $WhatIfPassed"
 
 	if (!($Path))
 	{
@@ -204,7 +205,7 @@ Function Remove-FileSystemObject()
                             }
                         }
 
-                        if ($PSBoundParameters.ContainsKey('whatif') -and $PSBoundParameters['whatif'])
+                        if ($WhatIfPassed)
                         {
                             $Status = "pass"
                             $Reason = "WhatIf passed - nothing removed. See output of find function about removed items."

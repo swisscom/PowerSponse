@@ -1,3 +1,8 @@
+# Working with the repository
+# - Use Invoke-PowerSponse or New-CleanupPackage commands
+# - Within PowerShell use e.g. (Get-PowerSponseRepository)['ProcessItem'] 
+#   to get  configuration for specific repository items
+
 $Script:Repository = @{
 
 	ServiceItem = @{
@@ -37,6 +42,9 @@ $Script:Repository = @{
 		Methods = @("WMI", "External","WinRM")
 		Parameter = @{
 			Name = "-Name"
+		}
+		ParameterOpt = @{
+			StopAll = "-StopAll"
 		}
 	}
 
@@ -92,28 +100,32 @@ $Script:Repository = @{
 #>
 
 	DirectoryItem  = @{
-		DefaultAction = "Find"
+		DefaultAction = "Remove"
 		DefaultMethod = "WinRM"
 		Actions = @("Find", "Remove")
 		ActionFind = "Find-Directory"
 		ActionRemove = "Remove-Directory"
 		Methods = @("WinRM")
 		Parameter = @{
-			File = "-Path"
+			Path = "-Path"
+        }
+        ParameterOpt = @{
 			Regex = "-Regex"
 			Recurse = "-Recurse"
         }
 	}
 
 	FileItem  = @{
-		DefaultAction = "Find"
+		DefaultAction = "Remove"
 		DefaultMethod = "WinRM"
 		Actions = @("Find", "Remove")
 		ActionFind = "Find-File"
 		ActionRemove = "Remove-File"
 		Methods = @("WinRM")
 		Parameter = @{
-			File = "-Path"
+			Path = "-Path"
+        }
+		ParameterOpt = @{
 			Regex = "-Regex"
 			Recurse = "-Recurse"
         }

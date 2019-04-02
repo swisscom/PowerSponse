@@ -38,7 +38,7 @@ Function Invoke-PowerSponse()
 		$ComputerList,
 
 		[boolean]
-		$OnlineCheck = $true,
+		$OnlineCheck = $false,
 
 		[switch]
 		$IgnoreMissing,
@@ -51,6 +51,7 @@ Function Invoke-PowerSponse()
 	Write-Verbose "$Function Entering $Function"
 
 	$ret = @()
+    $WhatIfPassed = ($PSBoundParameters.ContainsKey('whatif') -and $PSBoundParameters['whatif'])
 
 	Write-Verbose "$Function OnlineCheck: $OnlineCheck"
 
@@ -100,7 +101,7 @@ Function Invoke-PowerSponse()
 	{
 		Write-Progress -Activity "Running $Function" -Status "Check connection to $target..."
 
-		if (!(Test-Connection $target -Quiet -Count 1))
+		if ($OnlineCheck -and !(Test-Connection $target -Quiet -Count 1))
 		{
 			$Status="fail"
 			$Reason="Offline"
@@ -182,17 +183,16 @@ Function Invoke-PowerSponse()
 						$Command = "`$val = "
 						$Command += $CommandAction
 						$DefaultParams = @{
-							OnlineCheck =  $OnlineCheck
+							#OnlineCheck =  $OnlineCheck
 							ComputerName =  $target
 						}
 						$Command += " @DefaultParams"
 						$Command += " -Method $CommandMethod"
+						$Command += " -WhatIf:`$$WhatIfPassed"
 						
 						$Params = $Script:Repository.$ActionName.Parameter
 						foreach ($Param in $Params.Keys)
 						{
-							# todo add posiblity to use switch parameters
-							# => empty value could be used as switch parameters
 							if (!$($Action.$Param))
 							{
 								write-error "No value for parameter $($params.$Param) for action $ActionName in rule $RuleName"
@@ -203,6 +203,22 @@ Function Invoke-PowerSponse()
 							{
 								$Command += " $($Params.$Param) `"$($Action.$Param)`""
 							}
+						}
+
+                        $Params = $Script:Repository.$ActionName.ParameterOpt
+						foreach ($Param in $Params.Keys)
+						{
+                            if ($Action.PSobject.Properties.name -match $Param) # is key in rule available?
+                            {
+                                if ($Action.$Param) # is value in rule available?
+                                {
+                                    $Command += " $($Params.$Param) `"$($Action.$Param)`""
+                                }
+                                else # empty value for key means switch param
+                                {
+                                    $Command += " $($Params.$Param):`$true"
+                                }
+                            }
 						}
 
 						if ($PrintCommand)
@@ -266,8 +282,15 @@ function Get-PowerSponseRule()
 	# NOT USABLE
 	if ($method -match "json")
 	{
-		$Rules = (get-content "$RuleFile" -raw) | ConvertFrom-Json
-		$Rules = $Rules.PowerSponse.Rule
+        try
+        {
+            $Rules = (get-content "$RuleFile" -raw) | ConvertFrom-Json
+            $Rules = $Rules.PowerSponse.Rule
+        }
+        catch
+        {
+			throw "JSON could not be parsed - check scheme and syntax: $($_.exception.message)"
+        }
 	}
 	# more flexible than ConvertFrom-String
 	# good for meta data etc.
@@ -280,13 +303,13 @@ function Get-PowerSponseRule()
 		}
 		catch
 		{
-			throw "XML could not be parsed - check XML scheme and syntax"
+			throw "XML could not be parsed - check scheme and syntax: $($_.exception.message)"
 		}
 	}
 
 	if (!$Rules)
 	{
-		write-error "Could not read PowerSponse rules - check XML scheme"
+		write-error "Could not read PowerSponse rules - check scheme"
 	}
 	else
 	{
@@ -340,6 +363,8 @@ Function New-CleanupPackage()
 	{
 		write-error "$OutputPath not found"
 	}
+
+    $WhatIfPassed = ($PSBoundParameters.ContainsKey('whatif') -and $PSBoundParameters['whatif'])
 
 	# path to cleanup file
 	$FilePath = "$OutputPath\$PackageName"
@@ -464,14 +489,13 @@ Function New-CleanupPackage()
 
 				$Command = "`$ret += "
 				$Command += $CommandAction
-				$Command += " -OnlineCheck:`$False -ComputerName:$ComputerName"
+				$Command += " -ComputerName:$ComputerName"
 				$Command += " -Method $CommandMethod"
+				$Command += " -WhatIf:`$$WhatIfPassed"
 
 				$Params = $Script:Repository.$ActionName.Parameter
 				foreach ($Param in $Params.Keys)
 				{
-					# todo add posiblity to use switch parameters
-					# => empty value could be used as switch parameters
 					if (!$($Action.$Param))
 					{
 						write-error "No value for parameter $($params.$Param) for action $ActionName."
@@ -484,6 +508,21 @@ Function New-CleanupPackage()
 					}
 				}
 
+                $Params = $Script:Repository.$ActionName.ParameterOpt
+                foreach ($Param in $Params.Keys)
+                {
+                    if ($Action.PSobject.Properties.name -match $Param) # is key in rule available?
+                    {
+                        if ($Action.$Param) # is value in rule available?
+                        {
+                            $Command += " $($Params.$Param) `"$($Action.$Param)`""
+                        }
+                        else # empty value for key means switch param
+                        {
+                            $Command += " $($Params.$Param):`$true"
+                        }
+                    }
+                }
 
 				Write-Verbose $Command
 				$Command | Add-Content $FilePath

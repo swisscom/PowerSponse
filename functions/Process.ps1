@@ -165,7 +165,7 @@ Function Get-Process()
         [string] $Name,
 
         [Parameter(ParameterSetName='ByPid')]
-        [int] $Pid,
+        [int] $Id,
 
         [ValidateSet("OnlyPid", "OnlyName", "All")]
         [string] $OutputFormat = "all"
@@ -177,17 +177,17 @@ Function Get-Process()
     $returnobject = @()
     $res = ""
 
-    $Arguments = $(if ($Name) { "Name $($Name)" } else { "Pid: $($Pid)" } )
+    $Arguments = $(if ($Name) { "Name $($Name)" } else { "Pid: $($Id)" } )
 
     Write-Progress -Activity "Running $Function" -Status "Initializing..."
 
-    if (!$Name -and !$Pid)
+    if (!$Name -and !$Id)
     {
-        $Reason = "no process name or process id, please use -Name or -Pid"
+        $Reason = "no process name or process id, please use -Name or -Id"
         $Status = "fail"
         $returnobject += New-PowerSponseObject -Function $Function -Status $Status -Reason $Reason -Arguments $Arguments
     }
-    elseif ($Name -and $Pid)
+    elseif ($Name -and $Id)
     {
         $Status = "fail"
         $Reason = "both process name or process id given"
@@ -230,12 +230,12 @@ Function Get-Process()
                             }
                             else
                             {
-                                $res = Get-WmiObject Win32_Process -ComputerName $target -Credential $Credential -ErrorAction stop | ? {$_.Processid -eq $Pid}
+                                $res = Get-WmiObject Win32_Process -ComputerName $target -Credential $Credential -ErrorAction stop | ? {$_.Processid -eq $Id}
                             }
 
                             if (!$res)
                             {
-                                $Status = "fail"
+                                $Status = "pass"
                                 $Reason = "no process found"
                             }
                             # not used currently to distinguish between one or multiple processes
@@ -274,7 +274,7 @@ Function Get-Process()
                     }
                     elseif ($Method -match "winrm")
                     {
-                        Write-Verbose "Using WinRM - Name: $Name, Id: $Pid"
+                        Write-Verbose "Using WinRM - Name: $Name, Id: $Id"
 
                         try
                         {
@@ -309,7 +309,7 @@ Function Get-Process()
                             {
                                 $params += @{
                                     'ScriptBlock' = {param($p1) Microsoft.PowerShell.Management\get-process -Id $p1 -ea SilentlyContinue}
-                                    'ArgumentList' = $Pid
+                                    'ArgumentList' = $Id
                                 }
 
                                 $res = invoke-command @params
@@ -317,7 +317,7 @@ Function Get-Process()
 
                             if (!$res)
                             {
-                                $Status = "fail"
+                                $Status = "pass"
                                 $Reason = "no process found"
                             }
                             else
@@ -381,7 +381,7 @@ Function Get-Process()
                                     }
                                     else
                                     {
-                                        $proc = Start-Process "pslist.exe" "-accepteula -nobanner \\$target $Pid"
+                                        $proc = Start-Process "pslist.exe" "-accepteula -nobanner \\$target $Id"
                                     }
 
                                     if ($proc.stdout | select-string "not" -quiet)
@@ -564,13 +564,13 @@ Function Stop-Process()
 
         [switch] $NoRemoteRegistry,
 
-        [boolean] $OnlineCheck = $true,
+        [boolean] $OnlineCheck = $false,
 
         [Parameter(ParameterSetName='ByName')]
         [string] $Name,
 
         [Parameter(ParameterSetName='ByPid')]
-        [int] $Pid,
+        [int] $Id,
 
         [switch] $StopAll
 
@@ -581,7 +581,7 @@ Function Stop-Process()
 
     $returnobject = @()
 
-    $Arguments = $(if ($Name) { "Name $($Name)" } else { "Pid: $($Pid)" } )
+    $Arguments = $(if ($Name) { "Name $($Name)" } else { "Pid: $($Id)" } )
     $Arguments += ", StopAll: $StopAll"
     $Arguments += ", Onlinecheck: $OnlineCheck"
     Write-Verbose "Arguments: $Arguments"
@@ -606,13 +606,13 @@ Function Stop-Process()
     }
     Write-Verbose "NoRemoteRegistry $NoRemoteRegistry"
 
-    if (!$Name -and !$Pid)
+    if (!$Name -and !$Id)
     {
          $Status = "fail"
          $Reason = "no process name or process id"
          $returnobject += New-PowerSponseObject -Function $Function -Status $Status -Reason $Reason -Arguments $Arguments
     }
-    elseif ($Name -and $Pid)
+    elseif ($Name -and $Id)
     {
          $Status = "fail"
          $Reason = "both process name or process id given"
@@ -654,12 +654,12 @@ Function Stop-Process()
                         }
                         else
                         {
-                            $res = Get-WmiObject Win32_Process -ComputerName $target -Credential $Credential | ? {$_.Processid -eq $Pid}
+                            $res = Get-WmiObject Win32_Process -ComputerName $target -Credential $Credential | ? {$_.Processid -eq $Id}
                         }
 
                         if (!$res)
                         {
-                            $Status = "fail"
+                            $Status = "pass"
                             $Reason = "no process"
                         }
                         elseif ((($res | measure).count -gt 1 ) -and !$StopAll)
@@ -693,7 +693,7 @@ Function Stop-Process()
                     }
                     elseif ($Method -match "winrm")
                     {
-                        Write-Verbose "Using WinRM - Name: $Name, Id: $Pid"
+                        Write-Verbose "Using WinRM - Name: $Name, Id: $Id"
 
                         if ($Name)
                         {
@@ -702,20 +702,20 @@ Function Stop-Process()
                         }
                         else
                         {
-                            $ret = Get-Process -ComputerName $target -Method WinRM -Pid $Pid
+                            $ret = Get-Process -ComputerName $target -Method WinRM -Id $Id
                             $returnobject += $ret
                         }
 
                         if ($ret -and ($ret.reason -match "no process found"))
                         {
-                            $Status = "fail"
+                            $Status = "pass"
                             $Reason = "no process"
                             Continue
                         }
                         elseif ($ret -and ($ret.reason | measure).count -gt 1 -and !$StopAll)
                         {
                             $Status = "fail"
-                            $Reason = "kill multiple processes without -stopall"
+                            $Reason = "trying to kill multiple processes without -stopall"
                         }
                         else
                         {
@@ -817,11 +817,11 @@ Function Stop-Process()
                                 {
                                     if ($IsLocalhost)
                                     {
-                                        $proc = Start-Process pslist.exe -CommandLine "-accepteula -nobanner $Pid"
+                                        $proc = Start-Process pslist.exe -CommandLine "-accepteula -nobanner $Id"
                                     }
                                     else
                                     {
-                                        $proc = Start-Process pslist.exe -CommandLine "-accepteula -nobanner \\$target $Pid"
+                                        $proc = Start-Process pslist.exe -CommandLine "-accepteula -nobanner \\$target $Id"
                                     }
                                 }
 
@@ -863,11 +863,11 @@ Function Stop-Process()
                                         {
                                             if ($IsLocalhost)
                                             {
-                                                $proc = Start-Process pskill.exe -CommandLine "-accepteula -nobanner -t $Pid"
+                                                $proc = Start-Process pskill.exe -CommandLine "-accepteula -nobanner -t $Id"
                                             }
                                             else
                                             {
-                                                $proc = Start-Process pskill.exe -CommandLine "-accepteula -nobanner -t \\$target $Pid"
+                                                $proc = Start-Process pskill.exe -CommandLine "-accepteula -nobanner -t \\$target $Id"
                                             }
                                         }
 

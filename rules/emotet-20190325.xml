@@ -1,0 +1,26 @@
+<PowerSponse>
+   <Rule>
+        <name>Emotet Cleanup</name>
+        <author>Swisscom CSIRT</author>
+        <date>2019-03-25</date>
+        <description>Kills emotet processes and removes dropped files.</description>
+        <links>https://any.run/report/68bc255f9b0db6a0d30a8f2dadfbee3256acfe12497bf93943bc1eab0735e45e/a2385d6f-34f7-403c-90d3-b1f9d2a90a5e</links>
+        <action>
+            <type>ProcessItem</type>
+            <Name>\d{3}.exe</Name>
+        </action>
+        <action>
+            <type>ProcessItem</type>
+            <Name>wabmetagen.exe</Name>
+        </action>
+        <action>
+            <type>FileItem</type>
+            <Path>C:\Users\*\*</Path>
+            <regex>\d{3}.exe</regex>
+        </action>
+        <action>
+            <type>DirectoryItem</type>
+            <Path>C:\Users\*\AppData\Local\wabmetagen\</Path>
+        </action>
+    </Rule>
+</PowerSponse>
