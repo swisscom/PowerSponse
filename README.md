@@ -216,7 +216,7 @@ CoRe rule.
     Save-Module -Name PowerSponse -Path <path> 
 
     # Install
-    Install-Module -Name PowerSponse -Scope CurrentUser
+    Install-Module -Name PowerSponse -Scope CurrentUser -AllowClobber
 
     # Update
     Update-Module -Name PowerSponse
@@ -339,7 +339,7 @@ OVERVIEW
 
     Example 1
 
-    PS> Get-ScheduledTask -TaskName ".*-S-\d{1}-\d{1}" -UseExternal -NoRemoteRegistry -OnlyTaskName
+    PS> Get-ScheduledTask -SearchString ".*-S-\d{1}-\d{1}" -NoRemoteRegistry -OnlyTaskName
 
 
     Time         : 06.01.2017 10:31:29
