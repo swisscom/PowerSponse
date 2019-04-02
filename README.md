@@ -170,7 +170,7 @@ that rule in combination with `Invoke-PowerSponse` or `New-CleanupPackage`.
                 },
                 {
                     "type" : "FileItem",
-                    "Name" : "C:\\users\\*\\appdata\\locallow\\*.tmp"
+                    "Path" : "C:\\users\\*\\appdata\\locallow\\*.tmp"
                 },
                 {
                     "type" : "TaskItem",
