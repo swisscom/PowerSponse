@@ -4,14 +4,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) 
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased](https://github.com/swisscom/PowerSponse/compare/v0.1.0...master)
+## [Unreleased](https://github.com/swisscom/PowerSponse/compare/v0.2.0...master)
+
+<!--
+### Added
+### Changed
+### Fixed
+### Security
+### Deprecated
+### Removed
+-->
+
+## [v0.2.0](https://github.com/swisscom/PowerSponse/compare/v0.1.0...v0.2.0) - 2019-04-02
 
 Finally **add WinRM implementation for finding or removing files and
-directories based on simple wildcards like * at the end of the path or the use
-of regex which is matched against the whole path**. Furthermore, a generic
-command `Invoke-PsExec` was added for a more confinient way to invoke PsExec.
-Beside the WinRM implementations for file system handling, the get and stop
-process function got their WinRM implementation as well.
+directories based on simple wildcards like * or the use of regex which is
+matched against the whole path**. Beside the WinRM implementations for file
+system handling, the get and stop process functions got their WinRM
+implementation as well. The repository file was changed to reflect those changes.
+The main functions using CORE rules (`Invoke-PowerSponse` and
+`New-CleanupPackage`) were updated too to allow the use of optional parameters
+in rules.
+
+Furthermore, a generic command `Invoke-PsExec` was added for a more convenient
+way to invoke PsExec.
 
 ### Added
 * Add `Invoke-PsExec` for easier usage of PsExec and remote command execution.
@@ -27,18 +43,21 @@ process function got their WinRM implementation as well.
   regex is possible.
 * Add WinRM implementation for `Remove-Directory`. The use of wildcards like * and
   regex is possible.
+* Add example emotet CORE rule.
 ### Changed
 * Use `Invoke-PsExec` inside of `Get-Autoruns`. Therefore, the whole handling
     of RemoteRegistry is not needed in `Get-Autoruns` and all code is inside
     `Invoke-PsExec`.
 * Add parameter `FilenamePostfix` to specify postfix for filename in output of
     `Get-Autoruns`.
-<!--
+* The main functions using CORE rules (`Invoke-PowerSponse` and
+  `New-CleanupPackage`) were updated to allow the use of optional parameters in
+  rules.
+* Update Repository to reflect all those changes above.
 ### Fixed
-### Security
-### Deprecated
+* Fix variable in process handling due to the reserved $Pid variable in PS.
 ### Removed
--->
+* Remove WMI file commands because they never worked (well).
 
 ## [v0.1.0](https://github.com/swisscom/PowerSponse/tree/v0.1.0) - 2018-08-02
 
