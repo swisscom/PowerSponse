@@ -121,7 +121,9 @@ Function Remove-FileSystemObject()
 		[string] $Path,
 		[switch] $Recurse,
 		[string] $Regex,
-		[switch] $File
+		[switch] $File,
+
+        [boolean] $OnlineCheck = $false
 	)
 
     $Function = $MyInvocation.MyCommand
@@ -133,6 +135,7 @@ Function Remove-FileSystemObject()
     $WhatIfPassed = ($PSBoundParameters.ContainsKey('whatif') -and $PSBoundParameters['whatif'])
 
 	$Arguments = "Path: $Path, File: $File, Recurse: $Recurse, Regex: $Regex, WhatIfPassed: $WhatIfPassed"
+    $Arguments += ", Onlinecheck: $OnlineCheck"
 
 	if (!($Path))
 	{
@@ -150,7 +153,9 @@ Function Remove-FileSystemObject()
 
             Write-Progress -Activity "Running $Function" -Status "Processing $Path with regex `"$Regex`" on $target..."
 
-            if (!(Test-Connection $target -Quiet -Count 1))
+            $IsLocalhost = ($target -match "localhost")
+
+            if (!$IsLocalhost -and $OnlineCheck -and !(Test-Connection $target -Quiet -Count 1))
             {
                 Write-Verbose "$target is offline"
                 $Status = "fail"
