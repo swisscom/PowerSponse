@@ -47,8 +47,8 @@ should allow using various commands dedicated to containment during incident res
 There are some unique features implemented in PowerSponse:
 * Focus on containment and not on detection or log collection and allows
     adding more functions easily with the implemented plugin system.
-* Handling of **literal or regular expressions** for searching or killing processes,
-  searching for or deactivating scheduled tasks or services. 
+* Handling of **literal or regular expressions** for searching or killing processes, 
+  files and directories, searching for or deactivating scheduled tasks or services. 
 * **Implementation of a rule engine ([CoRe
   rules](https://github.com/swisscom/PowerSponse/wiki/CoRe-rules)** which can be 
   used by `Invoke-PowerSponse` or `New-CleanupPackage` to reuse predefined
@@ -136,8 +136,8 @@ concatenate the output of all the commands at the end).
 
 ``` powershell
 PS> $ret = @()
-PS> $ret += Stop-Process -ComputerName comp1 -ProcessName "explorer"
-PS> $ret += Remove-File -ComputerName comp1 -Path "%userprofile%\appdata\locallow\" -FileName *.tmp
+PS> $ret += Stop-Process -ComputerName comp1 -Name "explorer"
+PS> $ret += Remove-File -ComputerName comp1 -Path "C:\users\*\appdata\locallow\*.tmp
 PS> $ret += Disable-ScheduledTask -ComputerName comp1 -TaskName "User_F.*_S.*-\{.{8}-(.{4}-){3}.{12}\}"
 PS> $ret += Restart-Computer -ComputerName comp1
 PS> $ret | select time, action, computername, status, reason
@@ -170,11 +170,11 @@ that rule in combination with `Invoke-PowerSponse` or `New-CleanupPackage`.
                 },
                 {
                     "type" : "FileItem",
-                    "searchstring" : "%userprofile%\\appdata\\locallow\\*.tmp"
+                    "Name" : "C:\\users\\*\\appdata\\locallow\\*.tmp"
                 },
                 {
                     "type" : "TaskItem",
-                    "searchstring" : "User_F.*_S.*-\\{.{8}-(.{4}-){3}.{12}\\}"
+                    "Name" : "User_F.*_S.*-\\{.{8}-(.{4}-){3}.{12}\\}"
                 },
                 {
                     "type" : "ComputerItem",
