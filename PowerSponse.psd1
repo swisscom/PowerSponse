@@ -12,7 +12,7 @@
 RootModule = 'PowerSponse.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.1.0'
+ModuleVersion = '0.2.0'
 
 # ID used to uniquely identify this module
 GUID = 'ca85e27c-3d41-49a1-9315-fb44966836b7'
