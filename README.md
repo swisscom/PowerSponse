@@ -231,8 +231,7 @@ CoRe rule.
 * Install PowerSponse from Github:
 
     * Clone or download the repo into your module path folder, usually
-      _~\Documents\WindowsPowerShell\modules_ on Windows or
-      _~/.local/share/powershell/Modules/_ on macOS (see _$env:PSModulePath_).
+      _~\Documents\WindowsPowerShell\modules_ on Windows (see _$env:PSModulePath_).
     * Clone or download the files to any other folder (could also be a share).
     * **Windows** Make sure to unblock the files when downloaded from the
         Internet by opening the properties page of the .psd1 and .psm1 files and
