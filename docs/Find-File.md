@@ -41,6 +41,15 @@ PS C:\> $ret | select -ExpandProperty reason
 
 Search for files with given regex in all AppData subfolders on localhost.
 
+### Example 3
+```powershell
+PS C:\> Find-File -Path C:\Users\*\ -Recurse -Regex "\\(.*)\\(\1)\.exe" | select -ExpandProperty reason
+```
+
+Search for files with given regex using backreference (name of exe is the same as the parent folder)
+in all user folders on localhost. Emotet names its binaries like the folder namne in AppData.
+However, there are many legitimate tools with this... so that's not an unique indicator.
+
 ## PARAMETERS
 
 ### -ComputerList
