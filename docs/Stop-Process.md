@@ -33,10 +33,17 @@ Stop a process.
 
 ### Example 1
 ```
-PS C:\> {{ Add example code here }}
+PS C:\> stop-Process -Name evil
 ```
 
-{{ Add example description here }}
+Stop process named evil
+
+### Example 2
+```
+PS C:\> stop-Process -Name "\\\w{3}.exe" -ComputerName $target
+```
+
+Stop process named with given regex pattern on remote host.
 
 ## PARAMETERS
 
