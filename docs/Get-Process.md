@@ -23,7 +23,7 @@ Get-Process [-ComputerName <String[]>] [-ComputerList <String>] [-Method <String
 ### ByPid
 ```
 Get-Process [-ComputerName <String[]>] [-ComputerList <String>] [-Method <String>] [-BinPath <String>]
- [-Session <PSSession[]>] [-Credential <PSCredential>] [-Pid <Int32>] [-OutputFormat <String>] [-WhatIf]
+ [-Session <PSSession[]>] [-Credential <PSCredential>] [-Id <Int32>] [-OutputFormat <String>] [-WhatIf]
  [-Confirm] [<CommonParameters>]
 ```
 
@@ -41,15 +41,7 @@ Use the parameter _-Credential_ to supply different credentials.
 
 ### Example 1
 ```
-PS> Get-Process -SearchString "p.*shell"
-
-
-Time         : 15.01.2017 18:05:25
-Function     : Get-Process
-ComputerName : localhost
-Arguments    : SearchString p.*shell
-Status       : pass
-Reason       : {4332 ; powershell.exe ; ...
+PS> Get-Process -Name "p.*shell"
 ```
 
 This command searches for everything with the given pattern in the process
@@ -193,12 +185,12 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -Pid
-Search for a process id.
+### -Name
+Search for a process name. Regex is supported.
 
 ```yaml
-Type: Int32
-Parameter Sets: ByPid
+Type: String
+Parameter Sets: ByName
 Aliases:
 
 Required: False
@@ -208,12 +200,12 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -Name
-{{Fill Name Description}}
+### -Id
+Search for a process id.
 
 ```yaml
-Type: String
-Parameter Sets: ByName
+Type: Int32
+Parameter Sets: ByPid
 Aliases:
 
 Required: False

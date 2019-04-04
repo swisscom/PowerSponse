@@ -31,7 +31,6 @@ PS C:\> remove-file -ComputerName $target -path "C:\users\username\evil.exe"
 Remove file based on regex. First every file is searched which matchs the path
 and the regex and then the remove function is called with the found files.
 
-
 ### Example 2
 ```powershell
 PS C:\> remove-file -ComputerName $target -path "C:\users\username\" -Recurse -Regex "\\\w{3}\."
@@ -204,13 +203,11 @@ Accept wildcard characters: False
 ```
 
 ### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable.
-For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 
 ### Keine
-
 
 ## OUTPUTS
 

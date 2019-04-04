@@ -97,7 +97,7 @@ Function Get-ScheduledTask()
 					if (!(Test-Path -Path "$BinPath\psexec.exe"))
 					{
 						$Status = "fail"
-						$Reason = "Binary psexec not found."
+						$Reason = "Binary psexec not found in bin path, see <modulepath>\bin\."
 					}
 					else
 					{

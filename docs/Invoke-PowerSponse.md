@@ -140,7 +140,9 @@ Accept wildcard characters: False
 ```
 
 ### -IgnoreMissing
-Proceed despite missing action types in the repository.```yaml
+Proceed despite missing action types in the repository.
+
+```yaml
 Type: SwitchParameter
 Parameter Sets: (All)
 Aliases:

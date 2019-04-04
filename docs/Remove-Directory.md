@@ -37,6 +37,7 @@ PS C:\> Remove-Directory -ComputerName $target -path "C:\users\username\folder\"
 
 Remove folder on remote host and select only the field 'reason'.
  
+
 ### Example 3
 ```powershell
 PS C:\> remove-Directory -ComputerName $target -path C:\users\username\ -Recurse -Regex "fs\w{4}$" | select -ExpandProperty reason
@@ -217,13 +218,11 @@ Accept wildcard characters: False
 ```
 
 ### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable.
-For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see about_CommonParameters (http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 
 ### Keine
-
 
 ## OUTPUTS
 

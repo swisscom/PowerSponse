@@ -23,7 +23,7 @@ Stop-Process [-ComputerName <String[]>] [-ComputerList <String>] [-Method <Strin
 ```
 Stop-Process [-ComputerName <String[]>] [-ComputerList <String>] [-Method <String>] [-BinPath <String>]
  [-Session <PSSession[]>] [-Credential <PSCredential>] [-NoRemoteRegistry] [-OnlineCheck <Boolean>]
- [-Pid <Int32>] [-StopAll] [-WhatIf] [-Confirm] [<CommonParameters>]
+ [-Id <Int32>] [-StopAll] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -228,8 +228,8 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -Pid
-PID for searching for.
+### -Id
+PID of process to stop.
 
 ```yaml
 Type: Int32

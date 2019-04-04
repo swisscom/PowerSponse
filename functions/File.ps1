@@ -301,8 +301,6 @@ Function Find-File()
         [ValidateSet("WinRM")]
         [string] $Method = "WinRM",
 
-		[string] $BinPath = $(Join-Path -Path $ModuleRoot -ChildPath "\bin"),
-
 		[System.Management.Automation.Runspaces.PSSession[]] $Session=$Null,
 
 		[System.Management.Automation.PSCredential] $Credential=$Null,
@@ -350,8 +348,6 @@ Function Find-Directory()
         [ValidateSet("WinRM")]
         [string] $Method = "WinRM",
 
-		[string] $BinPath = $(Join-Path -Path $ModuleRoot -ChildPath "\bin"),
-
 		[System.Management.Automation.Runspaces.PSSession[]] $Session=$Null,
 
 		[System.Management.Automation.PSCredential] $Credential=$Null,
@@ -398,8 +394,6 @@ Function Find-FileSystemObject()
 
         [ValidateSet("WinRM")]
         [string] $Method = "WinRM",
-
-		[string] $BinPath = $(Join-Path -Path $ModuleRoot -ChildPath "\bin"),
 
 		[System.Management.Automation.Runspaces.PSSession[]] $Session=$Null,
 
@@ -625,7 +619,13 @@ function Get-FileHandle()
 
 	Write-Progress -Activity "Running $Action" -Status "Initializing..."
 
-	if (!$ProcessName -and !$ProcessPid)
+    if (!(Test-Path -Path "$BinPath\handle.exe"))
+    {
+        $Status = "fail"
+        $Reason = "Binary handle.exe not found in bin path, see <modulepath>\bin\."
+        $returnobject += New-PowerSponseObject -Function $Action -Status $Status -Reason $Reason -Arguments $Arguments -ComputerName $target
+    }
+	elseif (!$ProcessName -and !$ProcessPid)
 	{
 		$Status = "fail"
 		$Reason = "specify ProcessName or ProcessPid"

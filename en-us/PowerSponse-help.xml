@@ -2576,7 +2576,7 @@ Time                Action                ComputerName Arguments                
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="0" aliases="none">
           <maml:name>ComputerName</maml:name>
           <maml:Description>
-            <maml:para>Target computer</maml:para>
+            <maml:para>Target computer separated by comma.</maml:para>
           </maml:Description>
           <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
           <dev:type>
@@ -2588,7 +2588,7 @@ Time                Action                ComputerName Arguments                
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
           <maml:name>ComputerList</maml:name>
           <maml:Description>
-            <maml:para>{{Fill ComputerList Description}}</maml:para>
+            <maml:para>Target computer lists in a text file.</maml:para>
           </maml:Description>
           <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
@@ -2699,7 +2699,7 @@ Time                Action                ComputerName Arguments                
       <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
         <maml:name>ComputerList</maml:name>
         <maml:Description>
-          <maml:para>{{Fill ComputerList Description}}</maml:para>
+          <maml:para>Target computer lists in a text file.</maml:para>
         </maml:Description>
         <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
@@ -2711,7 +2711,7 @@ Time                Action                ComputerName Arguments                
       <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="0" aliases="none">
         <maml:name>ComputerName</maml:name>
         <maml:Description>
-          <maml:para>Target computer</maml:para>
+          <maml:para>Target computer separated by comma.</maml:para>
         </maml:Description>
         <command:parameterValue required="true" variableLength="false">String[]</command:parameterValue>
         <dev:type>
@@ -2845,9 +2845,16 @@ Time                Action                ComputerName Arguments                
     <command:examples>
       <command:example>
         <maml:title>-------------------------- Example 1 --------------------------</maml:title>
-        <dev:code>PS C:\&gt; {{ Add example code here }}</dev:code>
+        <dev:code>PS C:\&gt; Find-Directory -path C:\Users\*\AppData\Local\wabmetagen\ -ComputerName $target</dev:code>
         <dev:remarks>
-          <maml:para>{{ Add example description here }}</maml:para>
+          <maml:para>Search for wabmetagen directory inside user profiles on remote host.  Without -ComputerName the command is executed on localhost.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- Example 2 --------------------------</maml:title>
+        <dev:code>PS C:\&gt; find-Directory -Path C:\Users\*\* -Regex "\d{3}\w{2}"</dev:code>
+        <dev:remarks>
+          <maml:para>Search for folders named with the given regex pattern.</maml:para>
         </dev:remarks>
       </command:example>
     </command:examples>
@@ -3157,6 +3164,13 @@ PS C:\&gt; $ret
 PS C:\&gt; $ret | select -ExpandProperty reason</dev:code>
         <dev:remarks>
           <maml:para>Search for files with given regex in all AppData subfolders on localhost.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- Example 3 --------------------------</maml:title>
+        <dev:code>PS C:\&gt; Find-File -Path C:\Users\*\ -Recurse -Regex "\\(.*)\\(\1)\.exe" | select -ExpandProperty reason</dev:code>
+        <dev:remarks>
+          <maml:para>Search for files with given regex using backreference (name of exe is the same as the parent folder) in all user folders on localhost. Emotet names its binaries like the folder namne in AppData. However, there are many legitimate tools with this... so that's not an unique indicator.</maml:para>
         </dev:remarks>
       </command:example>
     </command:examples>
@@ -4194,7 +4208,7 @@ PS C:\&gt; $ret | select -ExpandProperty reason</dev:code>
       </maml:description>
     </command:details>
     <maml:description>
-      <maml:para>Reads the current PowerSponse repository. The repository contains the defintion for the functions which are available for using inside CoRe rules.</maml:para>
+      <maml:para>Reads the current PowerSponse repository. The repository contains the defintion for the functions which are available for using inside CoRe rules  and the corresponding commands `Invoke-PowerSponse` or `New-CleanupPackage`.</maml:para>
     </maml:description>
     <command:syntax>
       <command:syntaxItem>
@@ -4230,9 +4244,16 @@ PS C:\&gt; $ret | select -ExpandProperty reason</dev:code>
     <command:examples>
       <command:example>
         <maml:title>-------------------------- Example 1 --------------------------</maml:title>
-        <dev:code>PS C:\&gt; {{ Add example code here }}</dev:code>
+        <dev:code>PS C:\&gt; Get-PowerSponseRepository</dev:code>
         <dev:remarks>
-          <maml:para>{{ Add example description here }}</maml:para>
+          <maml:para>Read the PowerSponse repository configuration. The repository defines the commands  which could be used by `Invoke-PowerSponse` or `New-CleanupPackage`.</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- Example 2 --------------------------</maml:title>
+        <dev:code>PS C:\&gt; (Get-PowerSponseRepository)['ProcessItem']</dev:code>
+        <dev:remarks>
+          <maml:para>Read the PowerSponse configuration for the ProcessItem actions. The PowerSponse  repository defines the commands which could be used by `Invoke-PowerSponse`  or `New-CleanupPackage`.</maml:para>
         </dev:remarks>
       </command:example>
     </command:examples>
@@ -4532,13 +4553,13 @@ PS C:\&gt; $ret | select -ExpandProperty reason</dev:code>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
-          <maml:name>Pid</maml:name>
+          <maml:name>Name</maml:name>
           <maml:Description>
-            <maml:para>Search for a process id.</maml:para>
+            <maml:para>Search for a process name. Regex is supported.</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
-            <maml:name>Int32</maml:name>
+            <maml:name>String</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -4653,13 +4674,13 @@ PS C:\&gt; $ret | select -ExpandProperty reason</dev:code>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
-          <maml:name>Name</maml:name>
+          <maml:name>Id</maml:name>
           <maml:Description>
-            <maml:para>{{Fill Name Description}}</maml:para>
+            <maml:para>Search for a process id.</maml:para>
           </maml:Description>
-          <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+          <command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
           <dev:type>
-            <maml:name>String</maml:name>
+            <maml:name>Int32</maml:name>
             <maml:uri />
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
@@ -4776,25 +4797,25 @@ PS C:\&gt; $ret | select -ExpandProperty reason</dev:code>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
       <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
-        <maml:name>Pid</maml:name>
+        <maml:name>Name</maml:name>
+        <maml:Description>
+          <maml:para>Search for a process name. Regex is supported.</maml:para>
+        </maml:Description>
+        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+        <dev:type>
+          <maml:name>String</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
+        <maml:name>Id</maml:name>
         <maml:Description>
           <maml:para>Search for a process id.</maml:para>
         </maml:Description>
         <command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
         <dev:type>
           <maml:name>Int32</maml:name>
-          <maml:uri />
-        </dev:type>
-        <dev:defaultValue>None</dev:defaultValue>
-      </command:parameter>
-      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
-        <maml:name>Name</maml:name>
-        <maml:Description>
-          <maml:para>{{Fill Name Description}}</maml:para>
-        </maml:Description>
-        <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-        <dev:type>
-          <maml:name>String</maml:name>
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
@@ -4819,15 +4840,7 @@ PS C:\&gt; $ret | select -ExpandProperty reason</dev:code>
     <command:examples>
       <command:example>
         <maml:title>-------------------------- Example 1 --------------------------</maml:title>
-        <dev:code>PS&gt; Get-Process -SearchString "p.*shell"
-
-
-Time         : 15.01.2017 18:05:25
-Function     : Get-Process
-ComputerName : localhost
-Arguments    : SearchString p.*shell
-Status       : pass
-Reason       : {4332 ; powershell.exe ; ...</dev:code>
+        <dev:code>PS&gt; Get-Process -Name "p.*shell"</dev:code>
         <dev:remarks>
           <maml:para>This command searches for everything with the given pattern in the process name or in the executable path.</maml:para>
         </dev:remarks>
@@ -4850,7 +4863,8 @@ Reason       : {4332 ; powershell.exe ; ...</dev:code>
       </maml:description>
     </command:details>
     <maml:description>
-      <maml:para>Find scheduled tasks based on regex.</maml:para>
+      <maml:para>Find scheduled tasks based on a search string which also supports regex.</maml:para>
+      <maml:para>The command uses the Windows binary "schtask" for querying scheduled task on  (remote) hosts. Therefore, no credential parameter is allowd and an  elevated shell is needed using the required permissions on remote host.</maml:para>
     </maml:description>
     <command:syntax>
       <command:syntaxItem>
@@ -5193,7 +5207,7 @@ Reason       : {4332 ; powershell.exe ; ...</dev:code>
     <command:examples>
       <command:example>
         <maml:title>-------------------------- Example 1 --------------------------</maml:title>
-        <dev:code>PS&gt; Get-ScheduledTask -SearchString ".*-S-\d{1}-\d{1}" -NoRemoteRegistry -OnlyTaskName
+        <dev:code>PS&gt; Get-ScheduledTask -SearchString ".*-S-\d{1}-\d{1}" -OnlyTaskName
 
 
 Time         : 06.01.2017 10:31:29
@@ -5203,7 +5217,7 @@ Arguments    : TaskName: .*-S-\d{1}-\d{1}
 Status       : pass
 Reason       : \G2MUpdateTask-S-1-5-21-111111111-2222222222-333333333-444444 ; \G2MUploadTask-S-1-5-21-111111111-2222222222-333333333-444444</dev:code>
         <dev:remarks>
-          <maml:para>{{ Add example description here }}</maml:para>
+          <maml:para>Search for scheduled tasks with the given regex and display only the task name.</maml:para>
         </dev:remarks>
       </command:example>
     </command:examples>
@@ -8109,9 +8123,9 @@ Wrote cleanup script to C:\Users\user\Cleanup-74862546-8dd6-4095-88b5-693c6dbaac
           <dev:defaultValue>False</dev:defaultValue>
         </command:parameter>
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
-          <maml:name>Pid</maml:name>
+          <maml:name>Id</maml:name>
           <maml:Description>
-            <maml:para>PID for searching for.</maml:para>
+            <maml:para>PID of process to stop.</maml:para>
           </maml:Description>
           <command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
           <dev:type>
@@ -8268,9 +8282,9 @@ Wrote cleanup script to C:\Users\user\Cleanup-74862546-8dd6-4095-88b5-693c6dbaac
         <dev:defaultValue>False</dev:defaultValue>
       </command:parameter>
       <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
-        <maml:name>Pid</maml:name>
+        <maml:name>Id</maml:name>
         <maml:Description>
-          <maml:para>PID for searching for.</maml:para>
+          <maml:para>PID of process to stop.</maml:para>
         </maml:Description>
         <command:parameterValue required="true" variableLength="false">Int32</command:parameterValue>
         <dev:type>
@@ -8308,9 +8322,16 @@ Wrote cleanup script to C:\Users\user\Cleanup-74862546-8dd6-4095-88b5-693c6dbaac
     <command:examples>
       <command:example>
         <maml:title>-------------------------- Example 1 --------------------------</maml:title>
-        <dev:code>PS C:\&gt; {{ Add example code here }}</dev:code>
+        <dev:code>PS C:\&gt; stop-Process -Name evil</dev:code>
         <dev:remarks>
-          <maml:para>{{ Add example description here }}</maml:para>
+          <maml:para>Stop process named evil</maml:para>
+        </dev:remarks>
+      </command:example>
+      <command:example>
+        <maml:title>-------------------------- Example 2 --------------------------</maml:title>
+        <dev:code>PS C:\&gt; stop-Process -Name "\\\w{3}.exe" -ComputerName $target</dev:code>
+        <dev:remarks>
+          <maml:para>Stop process named with given regex pattern on remote host.</maml:para>
         </dev:remarks>
       </command:example>
     </command:examples>
