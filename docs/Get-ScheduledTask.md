@@ -19,13 +19,17 @@ Get-ScheduledTask [-ComputerName <String[]>] [-ComputerList <String>] [-Method <
 ```
 
 ## DESCRIPTION
-Find scheduled tasks based on regex. 
+Find scheduled tasks based on a search string which also supports regex.
+
+The command uses the Windows binary "schtask" for querying scheduled task on 
+(remote) hosts. Therefore, no credential parameter is allowd and an 
+elevated shell is needed using the required permissions on remote host.
 
 ## EXAMPLES
 
 ### Example 1
 ```
-PS> Get-ScheduledTask -SearchString ".*-S-\d{1}-\d{1}" -NoRemoteRegistry -OnlyTaskName
+PS> Get-ScheduledTask -SearchString ".*-S-\d{1}-\d{1}" -OnlyTaskName
 
 
 Time         : 06.01.2017 10:31:29
@@ -36,7 +40,7 @@ Status       : pass
 Reason       : \G2MUpdateTask-S-1-5-21-111111111-2222222222-333333333-444444 ; \G2MUploadTask-S-1-5-21-111111111-2222222222-333333333-444444
 ```
 
-{{ Add example description here }}
+Search for scheduled tasks with the given regex and display only the task name.
 
 ## PARAMETERS
 
