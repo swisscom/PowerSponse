@@ -18,16 +18,27 @@ Get-PowerSponseRepository [<CommonParameters>]
 
 ## DESCRIPTION
 Reads the current PowerSponse repository. The repository contains the
-defintion for the functions which are available for using inside CoRe rules.
+defintion for the functions which are available for using inside CoRe rules 
+and the corresponding commands `Invoke-PowerSponse` or `New-CleanupPackage`.
 
 ## EXAMPLES
 
 ### Example 1
 ```
-PS C:\> {{ Add example code here }}
+PS C:\> Get-PowerSponseRepository
 ```
 
-{{ Add example description here }}
+Read the PowerSponse repository configuration. The repository defines the commands 
+which could be used by `Invoke-PowerSponse` or `New-CleanupPackage`.
+
+### Example 2
+```
+PS C:\> (Get-PowerSponseRepository)['ProcessItem']
+```
+
+Read the PowerSponse configuration for the ProcessItem actions. The PowerSponse 
+repository defines the commands which could be used by `Invoke-PowerSponse` 
+or `New-CleanupPackage`.
 
 ## PARAMETERS
 
