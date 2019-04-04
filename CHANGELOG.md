@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 ### Security
 ### Deprecated
-### Re
+### Removed
 -->
 
 ## [v0.2.2](https://github.com/swisscom/PowerSponse/compare/v0.2.1...v0.2.2) - 2019-04-04
