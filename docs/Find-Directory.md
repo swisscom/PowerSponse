@@ -25,15 +25,23 @@ Find directories on remote host based on simple wildcards or with regex. Use the
 
 ### Example 1
 ```powershell
-PS C:\> {{ Add example code here }}
+PS C:\> Find-Directory -path C:\Users\*\AppData\Local\wabmetagen\ -ComputerName $target
 ```
 
-{{ Add example description here }}
+Search for wabmetagen directory inside user profiles on remote host. 
+Without -ComputerName the command is executed on localhost.
+
+### Example 2
+```powershell
+PS C:\> find-Directory -Path C:\Users\*\* -Regex "\d{3}\w{2}"
+```
+
+Search for folders named with the given regex pattern.
 
 ## PARAMETERS
 
 ### -ComputerList
-{{Fill ComputerList Description}}
+Target computer lists in a text file.
 
 ```yaml
 Type: String
@@ -48,7 +56,7 @@ Accept wildcard characters: False
 ```
 
 ### -ComputerName
-Target computer
+Target computer separated by comma.
 
 ```yaml
 Type: String[]
