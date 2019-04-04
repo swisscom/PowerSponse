@@ -4,19 +4,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) 
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased](https://github.com/swisscom/PowerSponse/compare/v0.2.1...master)
+## [Unreleased](https://github.com/swisscom/PowerSponse/compare/v0.2.2...master)
 
 <!--
 ### Added
 ### Changed
--->
 ### Fixed
-* Fix credential handling in file commands when using `-Credential` parameter
-<!--
 ### Security
 ### Deprecated
-### Removed
+### Re
 -->
+
+## [v0.2.2](https://github.com/swisscom/PowerSponse/compare/v0.2.1...v0.2.2) - 2019-04-04
+
+Fix credential handling in new file and directory commands when using
+`-Credential` parameter. Furthermore, improve PowerShell help.
 
 ## [v0.2.1](https://github.com/swisscom/PowerSponse/compare/v0.2.0...v0.2.1) - 2019-04-02
 
