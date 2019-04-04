@@ -43,7 +43,7 @@ Function Remove-File()
     {
 		$targets = Get-Target -ComputerList:$(if ($ComputerList){$ComputerList}) -ComputerName:$(if ($ComputerName){$ComputerName})
 
-	    Remove-FileSystemObject -targets $targets -Method:$Method -File -Path:$Path -Recurse:$Recurse -Regex:$Regex -WhatIf:$WhatIfPassed
+	    Remove-FileSystemObject -targets $targets -Method:$Method -File -Path:$Path -Recurse:$Recurse -Regex:$Regex -WhatIf:$WhatIfPassed -Credential:$Credential
 	}
 
 	$returnobject
@@ -97,7 +97,7 @@ Function Remove-Directory()
     {
 		$targets = Get-Target -ComputerList:$(if ($ComputerList){$ComputerList}) -ComputerName:$(if ($ComputerName){$ComputerName})
 
-	    Remove-FileSystemObject -targets $targets -Method:$Method -Path:$Path -Recurse:$Recurse -Regex:$Regex -WhatIf:$WhatIfPassed
+	    Remove-FileSystemObject -targets $targets -Method:$Method -Path:$Path -Recurse:$Recurse -Regex:$Regex -WhatIf:$WhatIfPassed -Credential:$Credential
 	}
 
 	$returnobject
@@ -172,7 +172,7 @@ Function Remove-FileSystemObject()
                 {
                     Write-Verbose "Using WinRM - File: $Path, Regex: $Regex"
 
-                    $returnobject_temp = Find-FileSystemObject -File:$File -target $target -Method winrm -Path:$Path -Recurse:$Recurse -Regex:$Regex
+                    $returnobject_temp = Find-FileSystemObject -File:$File -target $target -Method winrm -Path:$Path -Recurse:$Recurse -Regex:$Regex -Credential:$Credential
                     $returnobject += $returnobject_temp
 
                     $items = $null
@@ -329,7 +329,7 @@ Function Find-File()
     {
 		$targets = Get-Target -ComputerList:$(if ($ComputerList){$ComputerList}) -ComputerName:$(if ($ComputerName){$ComputerName})
 
-	    Find-FileSystemObject -targets $targets -Method:$Method -File -Path:$Path -Recurse:$Recurse -Regex:$Regex
+	    Find-FileSystemObject -targets $targets -Method:$Method -File -Path:$Path -Recurse:$Recurse -Regex:$Regex -Credential:$Credential
 	}
 
 	$returnobject
@@ -379,7 +379,8 @@ Function Find-Directory()
     {
 		$targets = Get-Target -ComputerList:$(if ($ComputerList){$ComputerList}) -ComputerName:$(if ($ComputerName){$ComputerName})
 
-	    Find-FileSystemObject -targets $targets -Method:$Method -Path:$Path -Recurse:$Recurse -Regex:$Regex
+	    Find-FileSystemObject -targets $targets -Method:$Method -Path:$Path -Recurse:$Recurse -Regex:$Regex -Credential:$Credential
+
 	}
 
 	$returnobject

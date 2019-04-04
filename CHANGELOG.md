@@ -9,7 +9,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <!--
 ### Added
 ### Changed
+-->
 ### Fixed
+* Fix credential handling in file commands when using `-Credential` parameter
+<!--
 ### Security
 ### Deprecated
 ### Removed
