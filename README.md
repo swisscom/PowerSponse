@@ -209,7 +209,7 @@ CoRe rule.
 
 ## Installation
 
-* Install PowerSponse from [PowerShell Gallery](https://www.powershellgallery.com/packages/PowerSponse/). [PowerShellGet](https://github.com/powerShell/powershellget) is required which is installed in PowerShell Core and since Windows PowerShell v5 by default. Only released versions are available there, see [CHANGELOG](CHANGELOG.md).
+* **Install PowerSponse from [PowerShell Gallery](https://www.powershellgallery.com/packages/PowerSponse/)**. [PowerShellGet](https://github.com/powerShell/powershellget) is required which is installed in PowerShell Core and since Windows PowerShell v5 by default. Only released versions are available there, see [CHANGELOG](CHANGELOG.md).
 
     ``` powershell
     # Inspect
@@ -228,17 +228,19 @@ CoRe rule.
    Register-PSRepository -Default
    ```
 
-* Install PowerSponse from Github:
+* **Install PowerSponse from Github**
 
     * Clone or download the repo into your module path folder, usually
-      _~\Documents\WindowsPowerShell\modules_ on Windows or
-      _~/.local/share/powershell/Modules/_ on macOS (see _$env:PSModulePath_).
+      _~\Documents\WindowsPowerShell\modules_ on Windows (see _$env:PSModulePath_).
     * Clone or download the files to any other folder (could also be a share).
-    * **Windows** Make sure to unblock the files when downloaded from the
-        Internet by opening the properties page of the .psd1 and .psm1 files and
-        checking "Unblock" at the bottom.
-
-    The location changes how the module is imported.
+    * The location changes how the module is imported. See import below.
+    * **Make sure to unblock the files** - either using the command below or by opening 
+        the properties page of all the the .psd1 and .psm1 files and checking 
+	"Unblock" at the bottom.
+	
+	``` powershell
+   	gci <module path> -Recurse -Include *.ps1,*.psm1,*.psd1 | Unblock-File
+   	```
 
 * **OPTIONALLY** Download the needed binaries (only if you need them for the used commands)
   or put them manually in the bin folder. See README and binary-urls.txt
@@ -261,6 +263,18 @@ Read through the docs, try the commands out and make a pull request for
 missing functionality. There are a lot of missing commands...That said, enjoy
 mitigating the evil._
 
+
+### Authentication
+
+* Start a shell in escalated mode with your remote admin account
+  (shift-right-click and use "run as different user")
+* Start a shell with your user and store your credentials in a credential
+  variable and pass it to the commands with `-Credential`
+
+    ```powershell
+    $creds = Microsoft.PowerShell.Security\get-credential
+    ```
+
 ### Import
 
 If PowerSponse was saved inside the module path run the following command:
@@ -274,16 +288,6 @@ If PowerSponse was saved outside the module path run the command:
 ``` powershell
 Import-Module <path to module>\PowerSponse.psd1 -force
 ```
-
-### Authentication
-
-* Start a shell in escalated mode with your remote admin account
-  (shift-right-click and use "run as different user")
-* Store your credentials in a credential variable and pass them to the commands
-
-    ```powershell
-    $creds = Microsoft.PowerShell.Security\get-credential
-    ```
 
 ### Cmdlets
 
