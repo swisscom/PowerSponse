@@ -471,20 +471,37 @@ Function Find-FileSystemObject()
                         {
                             $params += @{
                                 'ScriptBlock' = {param($p1,$p2,$p3) Microsoft.PowerShell.Management\get-childitem -Path "$p1" `
-                                                                                                      -Recurse `
-                                                                                                      -File `
-                                                                                                      -force `
-                                                                                                      -ea SilentlyContinue }
+                                                                      -Recurse `
+                                                                      -File `
+                                                                      -force `
+                                                                      -ea SilentlyContinue `
+                                                                      | % { New-Object psobject -Property @{ `
+                                                                             FullName = $_.fullname; `
+                                                                             CreationTime=$_.CreationTime; `
+                                                                             LastWriteTime = $_.LastWriteTime; `
+                                                                             Length = $_.Length; `
+                                                                             Hash = $(($_ | Get-FileHash -Algorithm MD5).hash) `
+                                                                           }} `
+                                                                      }
                                 'ArgumentList' = $Path
                             }
                         }
                         elseif ($File)
                         {
                             $params += @{
-                                'ScriptBlock' = {param($p1,$p2,$p3) Microsoft.PowerShell.Management\get-item -Path "$p1" `
-                                                                                                      -ea SilentlyContinue `
-                                                                                                      -force `
-                                                                                                      | ? {$_.mode -notmatch "d.*"}}
+                                'ScriptBlock' = {
+                                            param($p1,$p2,$p3) Microsoft.PowerShell.Management\get-item -Path "$p1" `
+                                                                      -ea SilentlyContinue `
+                                                                      -force `
+                                                                      | ? {$_.mode -notmatch "d.*"} `
+                                                                      | % { New-Object psobject -Property @{ `
+                                                                             FullName = $_.fullname; `
+                                                                             CreationTime=$_.CreationTime; `
+                                                                             LastWriteTime = $_.LastWriteTime; `
+                                                                             Length = $_.Length; `
+                                                                             Hash = $(($_ | Get-FileHash -Algorithm MD5).hash) `
+                                                                           }} `
+                                                                       }
                                 'ArgumentList' = $Path
                             }
                         }
@@ -539,6 +556,12 @@ Function Find-FileSystemObject()
                                     CreationTime=$proc.CreationTime
                                     LastWriteTime=$proc.LastWriteTime
                                     Length=$proc.Length
+                                }
+                                if ($proc.hash)
+                                {
+                                    $info += @{
+                                        Hash=$proc.hash
+                                    }
                                 }
                                 $Reason += New-Object PSObject -Property $info
                             }

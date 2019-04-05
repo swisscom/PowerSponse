@@ -6,8 +6,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased](https://github.com/swisscom/PowerSponse/compare/v0.2.2...master)
 
-<!--
 ### Added
+* Return file hash in `find-file` command ([#9](https://github.com/swisscom/PowerSponse/issues/9)).
+<!--
 ### Changed
 ### Fixed
 ### Security
