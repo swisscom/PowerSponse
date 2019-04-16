@@ -480,7 +480,7 @@ Function Find-FileSystemObject()
                                                                              CreationTime=$_.CreationTime; `
                                                                              LastWriteTime = $_.LastWriteTime; `
                                                                              Length = $_.Length; `
-                                                                             Hash = $(($_ | Get-FileHash -Algorithm MD5).hash) `
+                                                                             Hash = $(($_ | Get-FileHash -Algorithm MD5 -ea SilentlyContinue).hash) `
                                                                            }} `
                                                                       }
                                 'ArgumentList' = $Path
@@ -499,7 +499,7 @@ Function Find-FileSystemObject()
                                                                              CreationTime=$_.CreationTime; `
                                                                              LastWriteTime = $_.LastWriteTime; `
                                                                              Length = $_.Length; `
-                                                                             Hash = $(($_ | Get-FileHash -Algorithm MD5).hash) `
+                                                                             Hash = $(($_ | Get-FileHash -Algorithm MD5 -ea SilentlyContinue).hash) `
                                                                            }} `
                                                                        }
                                 'ArgumentList' = $Path
