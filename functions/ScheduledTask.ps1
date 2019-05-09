@@ -37,7 +37,7 @@ Function Get-ScheduledTask()
 	$Arguments = "SearchString: $SearchString"
 	Write-Verbose "Arguments: $Arguments"
 
-	if ($PSBoundParameters.ContainsKey('whatif') -and $PSBoundParameters['whatif'])
+	if ($PSBoundParameters.ContainsKey('whatif') -and $PSBoundParameters['whatif'].ispresent)
 	{
 		$WhatIfPassed = $true
 	}
@@ -431,6 +431,17 @@ function Disable-ScheduledTask()
 	$Arguments = "SearchString $SearchString"
 	Write-Verbose "Arguments: $Arguments"
 
+
+	if ($PSBoundParameters.ContainsKey('whatif') -and $PSBoundParameters['whatif'].ispresent)
+	{
+		$WhatIfPassed = $true
+	}
+	else
+	{
+		$WhatIfPassed = $false
+	}
+	Write-Verbose "whatif: $WhatIfPassed"
+
 	if (!$SearchString)
 	{
  		$Reason = 'You have to provide a task name'
@@ -457,15 +468,15 @@ function Disable-ScheduledTask()
 			{
 				if ($Method -match "wmi")
 				{
-					$ret = Edit-ScheduledTask -Method wmi -ComputerName $target -SearchString $SearchString -TaskState "disable" -WhatIf:$PSBoundParameters.ContainsKey('WhatIf') -NoRemoteRegistry:$PSBoundParameters.ContainsKey('NoRemoteRegistry') -OnlineCheck:$false -Credential:$Credential
+					$ret = Edit-ScheduledTask -Method wmi -ComputerName $target -SearchString $SearchString -TaskState "disable" -WhatIf:$WhatIfPassed -NoRemoteRegistry:$PSBoundParameters.ContainsKey('NoRemoteRegistry') -OnlineCheck:$false -Credential:$Credential
 				}
 				elseif ($Method -match "winrm")
 				{
-					$ret = Edit-ScheduledTask -Method winrm -ComputerName $target -SearchString $SearchString -TaskState "disable" -WhatIf:$PSBoundParameters.ContainsKey('WhatIf') -NoRemoteRegistry:$PSBoundParameters.ContainsKey('NoRemoteRegistry') -OnlineCheck:$false -Credential:$Credential
+					$ret = Edit-ScheduledTask -Method winrm -ComputerName $target -SearchString $SearchString -TaskState "disable" -WhatIf:$WhatIfPassed -NoRemoteRegistry:$PSBoundParameters.ContainsKey('NoRemoteRegistry') -OnlineCheck:$false -Credential:$Credential
 				}
 				elseif ($Method -match "external")
 				{
-					$ret = Edit-ScheduledTask -Method external -ComputerName $target -SearchString $SearchString -TaskState "disable" -WhatIf:$PSBoundParameters.ContainsKey('WhatIf') -NoRemoteRegistry:$PSBoundParameters.ContainsKey('NoRemoteRegistry') -OnlineCheck:$false -Credential:$Credential
+					$ret = Edit-ScheduledTask -Method external -ComputerName $target -SearchString $SearchString -TaskState "disable" -WhatIf:$WhatIfPassed -NoRemoteRegistry:$PSBoundParameters.ContainsKey('NoRemoteRegistry') -OnlineCheck:$false -Credential:$Credential
 				}
 
 				# change action description for return object that they match current
@@ -519,10 +530,7 @@ Function Edit-ScheduledTask()
 
 	$returnobject = @()
 
-	$Arguments = "SearchString: $SearchString, TaskState: $TaskState, OnlineCheck: $OnlineCheck"
-	Write-Verbose $Arguments
-
-	if ($PSBoundParameters.ContainsKey('whatif') -and $PSBoundParameters['whatif'])
+	if ($PSBoundParameters.ContainsKey('whatif') -and $PSBoundParameters['whatif'].ispresent)
 	{
 		$WhatIfPassed = $true
 	}
@@ -531,6 +539,9 @@ Function Edit-ScheduledTask()
 		$WhatIfPassed = $false
 	}
 	Write-Verbose "whatif: $WhatIfPassed"
+
+	$Arguments = "SearchString: $SearchString, TaskState: $TaskState, OnlineCheck: $OnlineCheck, WhatIfPassed: $WhatIfPassed"
+	Write-Verbose $Arguments
 
 	if ($PSBoundParameters.ContainsKey('NoRemoteRegistry') -and $PSBoundParameters['NoRemoteRegistry'])
 	{

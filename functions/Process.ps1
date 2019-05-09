@@ -28,7 +28,7 @@ Function Invoke-PsExec()
 
     $ComputerName = Get-Target -ComputerName:$(if ($ComputerName){$ComputerName})
 
-    if ($PSBoundParameters.ContainsKey('whatif') -and $PSBoundParameters['whatif'])
+    if ($PSBoundParameters.ContainsKey('whatif') -and $PSBoundParameters['whatif'].ispresent)
     {
         $WhatIfPassed = $true
     }
@@ -586,7 +586,7 @@ Function Stop-Process()
     $Arguments += ", Onlinecheck: $OnlineCheck"
     Write-Verbose "Arguments: $Arguments"
 
-    if ($PSBoundParameters.ContainsKey('whatif') -and $PSBoundParameters['whatif'])
+    if ($PSBoundParameters.ContainsKey('whatif') -and $PSBoundParameters['whatif'].ispresent)
     {
         $WhatIfPassed = $true
     }

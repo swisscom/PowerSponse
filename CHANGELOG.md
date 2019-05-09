@@ -10,7 +10,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 * Return file hash in `find-file` command ([#9](https://github.com/swisscom/PowerSponse/issues/9)).
 <!--
 ### Changed
+-->
 ### Fixed
+* Fix issue with `-WhatIf` parameter when called from `Invoke-PowerSponse`
+<!--
 ### Security
 ### Deprecated
 ### Removed

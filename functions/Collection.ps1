@@ -20,7 +20,7 @@ function Get-Autoruns()
 
 	$targets = Get-Target -ComputerList:$(if ($ComputerList){$ComputerList}) -ComputerName:$(if ($ComputerName){$ComputerName})
 
-	if ($PSBoundParameters.ContainsKey('whatif') -and $PSBoundParameters['whatif'])
+	if ($PSBoundParameters.ContainsKey('whatif') -and $PSBoundParameters['whatif'].ispresent)
 	{
 		$WhatIfPassed = $true
 	}

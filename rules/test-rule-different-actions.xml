@@ -1,0 +1,29 @@
+<PowerSponse>
+    <Rule id="12341234-1234-1234-1234-123412341235">
+        <name>Generic PowerSponse test rule</name>
+        <author>user</author>
+        <date>2019-05-09</date>
+        <description>Generic test rule with (mostly) not found artifacts.</description>
+        <action>
+            <type>ProcessItem</type>
+            <Name>XXXX</Name>
+        </action>
+        <action>
+            <type>FileItem</type>
+            <Path>C:\Users\*\XX\YY\*</Path>
+            <regex>test.txt</regex>
+        </action>
+        <action>
+            <type>DirectoryItem</type>
+            <Path>C:\Users\*\XX\YY\ZZ</Path>
+        </action>
+        <action>
+            <type>ServiceItem</type>
+            <name>ServiceTestNameXYZ</name>
+        </action>
+        <action>
+            <type>TaskItem</type>
+            <searchstring>TEST-TASK-XYZ</searchstring>>
+        </action>
+    </Rule>
+</PowerSponse>

@@ -107,7 +107,7 @@ Function Edit-Computer()
 	$Arguments = "Command $Command, OnlineCheck: $OnlineCheck"
 	Write-Verbose $Arguments
 
-	if ($PSBoundParameters.ContainsKey('whatif') -and $PSBoundParameters['whatif'])
+	if ($PSBoundParameters.ContainsKey('whatif') -and $PSBoundParameters['whatif'].ispresent)
 	{
 		$WhatIfPassed = $true
 	}

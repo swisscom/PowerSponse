@@ -27,7 +27,7 @@ Function Remove-File()
     $ret = ""
 	$Arguments = $Path
 
-    if ($PSBoundParameters.ContainsKey('whatif') -and $PSBoundParameters['whatif'])
+    if ($PSBoundParameters.ContainsKey('whatif') -and $PSBoundParameters['whatif'].ispresent)
     {
         $WhatIfPassed = $true
     }
@@ -81,7 +81,7 @@ Function Remove-Directory()
     $ret = ""
 	$Arguments = $Path
 
-    if ($PSBoundParameters.ContainsKey('whatif') -and $PSBoundParameters['whatif'])
+    if ($PSBoundParameters.ContainsKey('whatif') -and $PSBoundParameters['whatif'].ispresent)
     {
         $WhatIfPassed = $true
     }

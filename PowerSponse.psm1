@@ -51,7 +51,7 @@ Function Invoke-PowerSponse()
 	Write-Verbose "$Function Entering $Function"
 
 	$ret = @()
-    $WhatIfPassed = ($PSBoundParameters.ContainsKey('whatif') -and $PSBoundParameters['whatif'])
+    $WhatIfPassed = ($PSBoundParameters.ContainsKey('whatif') -and $PSBoundParameters['whatif'].ispresent)
 
 	Write-Verbose "$Function OnlineCheck: $OnlineCheck"
 
@@ -364,7 +364,7 @@ Function New-CleanupPackage()
 		write-error "$OutputPath not found"
 	}
 
-    $WhatIfPassed = ($PSBoundParameters.ContainsKey('whatif') -and $PSBoundParameters['whatif'])
+    $WhatIfPassed = ($PSBoundParameters.ContainsKey('whatif') -and $PSBoundParameters['whatif'].ispresent)
 
 	# path to cleanup file
 	$FilePath = "$OutputPath\$PackageName"
