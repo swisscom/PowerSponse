@@ -30,23 +30,11 @@ Please see [Command Documentation](docs/PowerSponse.md),
 
 ## What is PowerSponse?
 
-PowerSponse (PowerShell + Response) is a PowerShell module for targeted
-containment and remediation.
+PowerSponse is a PowerShell module for targeted containment and remediation.
 
-There are a lot of awesome sources and tools for log and forensic
-artifact collection and analysis (e.g. timeline information, Windows Event Logs,
-Sysmon, GRR, Rekall, [PowerForensics](https://github.com/Invoke-IR/PowerForensics),
-[Kansa](https://github.com/davehull/Kansa) and many more). But there are none for the
-containment and remediation phase during incident response. Also a search within the
-awesome [awesome-incident-response](https://github.com/meirwah/awesome-incident-response)
-list does not contain any tools for containment and remediation. There are
-of course some enterprise EDR (endpoint detection and response) platforms
-which have some capabilities to contain threats (e.g. kill process). PowerSponse
-should allow using various commands dedicated to containment during incident response.
-
-There are some unique features implemented in PowerSponse:
-* Focus on containment and not on detection or log collection and allows
-    adding more functions easily with the implemented plugin system.
+Following features are implemented in PowerSponse:
+* Commands for containment and remediation which can be easily extended with
+  the implemented plugin system.
 * Handling of **literal or regular expressions** for searching or killing processes, 
   files and directories, searching for or deactivating scheduled tasks or services. 
 * **Implementation of a rule engine ([CoRe
@@ -54,28 +42,13 @@ There are some unique features implemented in PowerSponse:
   used by `Invoke-PowerSponse` or `New-CleanupPackage` to reuse predefined
   actions (e.g. a CoRe rule per malware family). This should be the 
   [YARA](https://virustotal.github.io/yara/) or [SIGMA](https://github.com/Neo23x0/sigma) 
-  equivalent but for containment and not for detection.
-* Run a **specific cleanup rule against one or more remote** hosts using
+  equivalent but for containment.
+* Use a CoRe rule for **specific cleanup against one or more remote** hosts using
     `Invoke-PowerSponse` or use `New-CleanupPackage` to **build a cleanup
     package** and deploy it to a remote host which is not reachable via network.
 
-A simplified incident response cycle is preparation, detection, investigation
-and response. All the above mentioned tools focus on detection and
-investigation. The last incident response phase (besides recovery
-and lessons learned), namely **the containment phase (deny, degrade and disrupt) is the
-main focus of PowerSponse**. The following table shows different available
-PowerShell tools and the corresponding incident phase.
-
-| Preparation / Pentesting | Analysis / Forensics | Containment / Remediation |
-| ------------------------ | -------------------- | ------------------------- |
-| Empire                   | Kansa                | PowerSponse               |
-| PowerSploit              | Invoke-LiveResponse  |                           |
-| p0wnedShell              | PowerForensics       |                           |
-| BloodHound               | PowerShellArsenal    |                           |
-|                          | CimSweep             |                           |
-|                          | AutoRuns             |                           |
-
-Of course, the containment part contradicts with the forensic soundness, which
+PowerSponse can be used in the **containment and remediation phase (deny, degrade and disrupt)** 
+of an incident. Of course, the containment part contradicts with the forensic soundness, which
 means that the source evidence (infected machine) is not altered in any
 way. The question is always: Would you like to limit the damage during an attack
 and control the communication flow to the attacker's servers or would you
@@ -100,28 +73,12 @@ The following use cases were in mind when implementing PowerSponse:
 	`New-CleanupPackage` with a 
 	[CoRe rule](https://github.com/swisscom/PowerSponse/wiki/CoRe-rules).
 
-**Repo Structure**
-
-| Name             | Description                                                          |
-| ---------------- | ------------------------------------------------------------------   |
-| bin              | All binaries files are saved in \bin by default                      |
-| docs             | Markdown documentation                                               |
-| en-us            | With playPS created PowerShell helpfile (for using help \<command\>) |
-| functions        | Cleanup and support functions                                        |
-| rules            | PowerSponse CoRe rules                                               |
-| test             | Pester tests (for using with Invoke-Pester)                          |
-| BUILD.md         | Build instructions for ctags, playPS and Pester                      |
-| PowerSponse.psd1 | PowerSponse module description                                       |
-| PowerSponse.psm1 | PowerSponse module file (loads all scripts in \functions)            |
-| tags             | ctags file for PowerSponse                                           |
-
 ## Example
 
-Dridex (yeah, old stuff, the example is from 2016, but the infection chain
-looks similar in current malware...) creates some files, injects itself into
+Dridex (yeah, old stuff, the example is from 2016) creates some files, injects itself into
 explorer and adds a scheduled task. Taken from [Detecting and removing
 Dridex](http://lpine.org/2016/06/detecting-removing-dridex/), the manual steps
-for containment could be the following:
+for containment are as follows:
 
 > 1. Kill explorer.exe process using taskkill /f /im explorer.exe
 > 2. Remove all tmp files from C:\users\username\data\locallow, del
@@ -132,7 +89,7 @@ for containment could be the following:
 > 4. Reboot the PC.
 
 With PowerSponse you could use these cmdlets directly (`@()` is used to
-concatenate the output of all the commands at the end).
+concatenate the output of all the commands).
 
 ``` powershell
 PS> $ret = @()
@@ -150,9 +107,9 @@ Time                Action                  ComputerName  Status Reason
 08.01.2017 16:41:54 Restart-Computer        comp1         pass   Rebooted
 ```
 
-Alternatively, create a corresponding
+Or create a corresponding
 [CoRe rule](https://github.com/swisscom/PowerSponse/wiki/CoRe-rules) and use
-that rule in combination with `Invoke-PowerSponse` or `New-CleanupPackage`.
+the rule in combination with `Invoke-PowerSponse` or `New-CleanupPackage`.
 
 ``` json
 {
@@ -190,18 +147,20 @@ that rule in combination with `Invoke-PowerSponse` or `New-CleanupPackage`.
 PS> Invoke-PowerSponse -ComputerName comp1 -Rule dridex-201606.json
 ```
 
-Instead of running the commands directly against the target computers, you can
-also used `New-CleanupPackage` with the [CoRe
-rule](https://github.com/swisscom/PowerSponse/wiki/CoRe-rules) which takes all
-functions and the commands into a new PowerShell script (.ps1) and therefore
-allows an offline deployment to the target host without having a direct
-network connection.
+``` powershell
+PS> New-CleanupPackage -Rule dridex-201606.json
+```
+
+Instead of running the commands directly against the target computers, you can use
+`New-CleanupPackage` which concatenates all scripts and commands into a new 
+PowerShell script and therefore allows an offline deployment to the 
+target host without having a direct network connection.
 
 ## Requirements
 
 To run PowerSponse commands via network you need remote administrator rights
 and need some ports open on the target machine, depending which
-method (WinRM, WMI, PsExec, ...) the command uses: 135 TCP, 139 TCP, 445
+method (WinRM, WMI, PsExec, ...) the remote management protocols use 135 TCP, 139 TCP, 445
 TCP, 5985 TCP, 5986 TCP. Alternatively, run the commands and PowerSponse
 scripts directly on the target (localhost) by importing the module on the
 target machine or by using the `New-CleanupPackage` in combination with a 
