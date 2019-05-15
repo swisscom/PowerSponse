@@ -17,8 +17,8 @@ Please see [Command Documentation](docs/PowerSponse.md),
 * [Requirements](#requirements)
 * [Installation](#installation)
 * [Usage](#usage)
-    * [Import](#import)
     * [Authentication](#authentication)
+    * [Import](#import)
     * [Cmdlets](#cmdlets)
     * [Help](#help)
 * [Contributing](#contributing)
@@ -32,9 +32,9 @@ Please see [Command Documentation](docs/PowerSponse.md),
 
 PowerSponse is a PowerShell module for targeted containment and remediation.
 
-Following features are implemented in PowerSponse:
+The following features are implemented in PowerSponse:
 * Commands for containment and remediation which can be easily extended with
-  the implemented plugin system.
+  the used plugin system.
 * Handling of **literal or regular expressions** for searching or killing processes, 
   files and directories, searching for or deactivating scheduled tasks or services. 
 * **Implementation of a rule engine ([CoRe
