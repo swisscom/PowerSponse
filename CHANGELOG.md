@@ -4,20 +4,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) 
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased](https://github.com/swisscom/PowerSponse/compare/v0.2.2...master)
+## [Unreleased](https://github.com/swisscom/PowerSponse/compare/v0.3.0...master)
+
+<!--
+### Added
+### Changed
+### Deprecated
+### Removed
+### Fixed
+### Security
+-->
+
+## [v0.3.0](https://github.com/swisscom/PowerSponse/compare/v0.2.2...v0.3.0) - 2019-05-15
+
+Add file hash in return object for `find-file` command and fix an issue with
+`-WhatIf` parameter in `Invoke-PowerSponse`.
 
 ### Added
 * Return file hash in `find-file` command ([#9](https://github.com/swisscom/PowerSponse/issues/9)).
-<!--
-### Changed
--->
 ### Fixed
-* Fix issue with `-WhatIf` parameter when called from `Invoke-PowerSponse`
-<!--
-### Security
-### Deprecated
-### Removed
--->
+* Fix issue with `-WhatIf` parameter when called from `Invoke-PowerSponse`.
 
 ## [v0.2.2](https://github.com/swisscom/PowerSponse/compare/v0.2.1...v0.2.2) - 2019-04-04
 

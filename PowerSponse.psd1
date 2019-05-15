@@ -12,7 +12,7 @@
 RootModule = 'PowerSponse.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.2.2'
+ModuleVersion = '0.3.0'
 
 # ID used to uniquely identify this module
 GUID = 'ca85e27c-3d41-49a1-9315-fb44966836b7'
@@ -24,7 +24,7 @@ Author = 'Swisscom (Schweiz) AG'
 CompanyName = 'Swisscom (Schweiz) AG'
 
 # Copyright statement for this module
-Copyright = '(c) 2018,2019 Swisscom (Schweiz) AG'
+Copyright = '(c) 2018-2019 Swisscom (Schweiz) AG'
 
 # Description of the functionality provided by this module
 Description = 'The module allows a fast and easy way to contain and remediate a threat on a remote host.'
