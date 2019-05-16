@@ -212,7 +212,10 @@ CoRe rule.
   ```
 
 ## Usage
- 
+
+Use `command -<tab>` to tab between the available parameters or use 
+`command -<ctrl+space>` to display a list of all paremeters. 
+
 **Disclaimer:** _The command interface is inconsistent, that means that some
 commands can have a `-Credential` parameter (WMI and WinRM can handle
 credential objects) and other commands which rely on external tools do not
