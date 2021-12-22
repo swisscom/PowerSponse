@@ -37,10 +37,10 @@ The following features are implemented in PowerSponse:
   the used plugin system.
 * Handling of **literal or regular expressions** for searching or killing processes, 
   files and directories, searching for or deactivating scheduled tasks or services. 
-* **Implementation of a rule engine ([CoRe
+* **Implementation of a rule engine** (**[CoRe
   rules](https://github.com/swisscom/PowerSponse/wiki/CoRe-rules)** which can be 
   used by `Invoke-PowerSponse` or `New-CleanupPackage` to reuse predefined
-  actions (e.g. a CoRe rule per malware family). This should be the 
+  actions, e.g. a CoRe rule per malware family). This should be the 
   [YARA](https://virustotal.github.io/yara/) or [SIGMA](https://github.com/Neo23x0/sigma) 
   equivalent but for containment.
 * Use a CoRe rule for **specific cleanup against one or more remote** hosts using
@@ -194,12 +194,12 @@ CoRe rule.
     * Clone or download the files to any other folder (could also be a share).
     * The location changes how the module is imported. See import below.
     * **Make sure to unblock the files** - either using the command below or by opening 
-        the properties page of all the the .psd1 and .psm1 files and checking 
-	"Unblock" at the bottom.
-	
-	``` powershell
-   	gci <module path> -Recurse -Include *.ps1,*.psm1,*.psd1 | Unblock-File
-   	```
+      the properties page of all the the .psd1 and .psm1 files and checking 
+      "Unblock" at the bottom.
+
+      ``` powershell
+      gci <module path> -Recurse -Include *.ps1,*.psm1,*.psd1 | Unblock-File
+      ```
 
 * **OPTIONALLY** Download the needed binaries (only if you need them for the used commands)
   or put them manually in the bin folder. See README and binary-urls.txt
