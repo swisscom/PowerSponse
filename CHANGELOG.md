@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) 
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+Update March 2022: Install PowerSponse from PowerShell Gallery was only 
+supported until March 2022. Afterwards, only manual install through 
+GitHub is provided. 
+
 ## [Unreleased](https://github.com/swisscom/PowerSponse/compare/v0.3.0...master)
 
 <!--
