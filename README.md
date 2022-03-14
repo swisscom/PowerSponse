@@ -168,24 +168,7 @@ CoRe rule.
 
 ## Installation
 
-* **Install PowerSponse from [PowerShell Gallery](https://www.powershellgallery.com/packages/PowerSponse/)**. [PowerShellGet](https://github.com/powerShell/powershellget) is required which is installed in PowerShell Core and since Windows PowerShell v5 by default. Only released versions are available there, see [CHANGELOG](CHANGELOG.md).
-
-    ``` powershell
-    # Inspect
-    Save-Module -Name PowerSponse -Path <path> 
-
-    # Install
-    Install-Module -Name PowerSponse -Scope CurrentUser -AllowClobber
-
-    # Update
-    Update-Module -Name PowerSponse
-    ```
-
-   If you get an error, try using the following command to set PowerShell Gallery as one of your repositories:
-
-   ``` powershell
-   Register-PSRepository -Default
-   ```
+Update March 2022: Install PowerSponse from PowerShell Gallery was only supported until March 2022. Afterwards, only manual install through GitHub is provided. See [CHANGELOG](CHANGELOG.md) for more details about versions.
 
 * **Install PowerSponse from Github**
 
