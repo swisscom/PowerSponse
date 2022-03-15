@@ -168,7 +168,7 @@ CoRe rule.
 
 ## Installation
 
-Update March 2022: Install PowerSponse from PowerShell Gallery was only supported until March 2022. Afterwards, only manual install through GitHub is provided. See [CHANGELOG](CHANGELOG.md) for more details about versions.
+Update March 2022: Install [PowerSponse from PowerShell Gallery](https://www.powershellgallery.com/packages/PowerSponse) was only supported until March 2022. Afterwards, only manual install through GitHub is provided. See [CHANGELOG](CHANGELOG.md) for more details about versions.
 
 * **Install PowerSponse from Github**
 
